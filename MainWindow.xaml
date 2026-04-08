@@ -1,0 +1,1740 @@
+﻿<Window x:Class="EFieldSimulation.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:helix="http://helix-toolkit.org/wpf"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        xmlns:vm="clr-namespace:EFieldSimulation.ViewModels" xmlns:local="clr-namespace:EFieldSimulation.Converters"
+        Title="Electric Field Simulator — Boundary Layer Control"
+        Width="1400" Height="800"
+        Background="#FF1E1E2E"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+        <local:CountToBarWidthConverter x:Key="CountToBarWidth"/>
+
+        <!-- Editable slider row: Label | Slider | TextBox | Unit -->
+        <Style x:Key="ParamTextBox" TargetType="TextBox">
+            <Setter Property="Width" Value="58"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Background" Value="#FF2A2A3A"/>
+            <Setter Property="Foreground" Value="#FFE0E0E0"/>
+            <Setter Property="BorderBrush" Value="#FF505068"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="3,1"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+        </Style>
+
+        <Style x:Key="UnitLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Foreground" Value="#FF707088"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="2,0,0,0"/>
+            <Setter Property="Width" Value="18"/>
+        </Style>
+
+        <Style x:Key="CompactSection" TargetType="TextBlock"
+               BasedOn="{StaticResource SectionHeader}">
+            <Setter Property="Margin" Value="0,10,0,2"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══ TOP TOOLBAR ═══ -->
+        <Border Grid.Row="0" Background="#FF2A2A3A" Padding="8,6">
+            <WrapPanel>
+                <!-- PROJECT FILE I/O -->
+                <TextBlock Text="PROJECT:" Style="{StaticResource SectionHeader}"
+                   Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <Button Content="💾 Save Project"
+                Command="{Binding SaveProjectCommand}"/>
+                <Button Content="📂 Open Project"
+                Command="{Binding LoadProjectCommand}"/>
+                <Button Content="📤 Export Field (.h5)"
+                Command="{Binding ExportFieldHdf5Command}"
+                ToolTip="Export selected entry's E-field to standalone HDF5"/>
+
+                <Rectangle Width="1" Fill="#FF505068" Margin="8,2"/>
+                
+                <TextBlock Text="SCENE:" Style="{StaticResource SectionHeader}"
+               Margin="0,0,8,0" VerticalAlignment="Center"/>
+
+                <Button Content="📐 Add Static (Mesh)"
+            Command="{Binding AddStaticEntryCommand}"/>
+                <Button Content="📐 Add Movable (Mesh)"
+            Command="{Binding AddMovableEntryCommand}"/>
+                <Button Content="⚛ Add Charge Volume"
+            Command="{Binding AddChargeVolumeCommand}"/>
+                <Button Content="⚡ Add Voltage Surface"
+            Command="{Binding AddVoltageSurfaceCommand}"/>
+                <Rectangle Width="1" Fill="#FF505068" Margin="8,2"/>
+
+                <TextBlock Text="CHARGE HANDLING:" Style="{StaticResource SectionHeader}"
+               Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <Button Content="📐 Tetrahedralize"
+                Command="{Binding AttachMeshCommand}"
+                ToolTip="Tetrahedralize mesh on selected entry (imports mesh if needed)"/>
+                <Button Content="⚡ E-Field (.h5)"
+            Command="{Binding AttachFieldCommand}"/>
+
+                <Rectangle Width="1" Fill="#FF505068" Margin="8,2"/>
+
+                <TextBlock Text="PROBES:" Style="{StaticResource SectionHeader}"
+           Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <Button Content="📍 Point Probe"
+        Command="{Binding AddPointProbeCommand}"
+        ToolTip="Add a single-point field/voltage probe"/>
+                <Button Content="📏 Line Probe"
+        Command="{Binding AddLineProbeCommand}"
+        ToolTip="Add a two-point line segment probe"/>
+                <Button Content="⚡ Evaluate Probes"
+        Command="{Binding EvaluateProbesCommand}"/>
+
+                <Rectangle Width="1" Fill="#FF505068" Margin="8,2"/>
+
+                <CheckBox Content="Show Field Arrows"
+              IsChecked="{Binding ShowFieldArrows}"
+              Foreground="#FFD0D0D0" VerticalAlignment="Center" Margin="8,0"/>
+                <CheckBox Content="Show Shape"
+              IsChecked="{Binding ShowShape}"
+              Foreground="#FFD0D0D0" VerticalAlignment="Center" Margin="8,0"/>
+                <CheckBox Content="Show Particles"
+          IsChecked="{Binding ShowParticles}"
+          Foreground="#FFD0D0D0" VerticalAlignment="Center" Margin="8,0"/>
+                <CheckBox Content="Show V-Surfaces"
+          IsChecked="{Binding ShowVoltageSurfaces}"
+          Foreground="#FFD0D0D0" VerticalAlignment="Center" Margin="8,0"/>
+                <CheckBox Content="Balance Charge Volumes"
+          IsChecked="{Binding BalanceChargeVolumes}"
+          Foreground="#FFD0D0D0" VerticalAlignment="Center" Margin="8,0"
+          ToolTip="Ensure total positive and negative charge magnitudes are equal (scales down larger)"/>
+                <CheckBox Content="Show Probes"
+          IsChecked="{Binding ShowProbes}"
+          Foreground="#FFD0D0D0" VerticalAlignment="Center" Margin="8,0"/>
+
+            </WrapPanel>
+        </Border>
+
+        <!-- ═══ MAIN CONTENT ═══ -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="290"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="360"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ─── LEFT PANEL: Transform + Slice + Charge Volume ─── -->
+            <Border Grid.Column="0" Background="#FF252535" Margin="2">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="10,6,10,10">
+
+                        <!-- ══════ SCENE OBJECTS ══════ -->
+                        <TextBlock Text="SCENE OBJECTS" Style="{StaticResource CompactSection}"/>
+                        <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" Margin="0,0,0,6"/>
+
+                        <ListBox ItemsSource="{Binding SceneEntries}"
+             SelectedItem="{Binding SelectedEntry}"
+             Height="120"
+             Background="#FF1E1E2E" Foreground="#FFD0D0D0"
+             BorderBrush="#FF404058">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox IsChecked="{Binding IsVisible}"
+                              VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <TextBlock Text="{Binding Name}" Foreground="#FFD0D0D0"/>
+                                        <TextBlock Foreground="#FF606078" Margin="4,0,0,0">
+                        <Run Text="("/>
+                        <Run Text="{Binding ContentSummary, Mode=OneWay}"/>
+                        <Run Text=")"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <Button Content="🗑 Delete Selected"
+            Command="{Binding DeleteSelectedCommand}"
+            HorizontalAlignment="Left" Margin="0,4,0,0"/>
+
+                        <!-- ══════ FIELD PROBES ══════ -->
+                        <TextBlock Text="FIELD PROBES"
+           Style="{StaticResource CompactSection}" Margin="0,14,0,2"/>
+                        <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" Margin="0,0,0,6"/>
+
+                        <ListBox ItemsSource="{Binding Probes}"
+         SelectedItem="{Binding SelectedProbe}"
+         Height="80"
+         Background="#FF1E1E2E" Foreground="#FFD0D0D0"
+         BorderBrush="#FF404058">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox IsChecked="{Binding IsVisible}"
+                          VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <TextBlock Foreground="#FFD0D0D0">
+                    <Run Text="{Binding Name, Mode=OneWay}"/>
+                                        </TextBlock>
+                                        <TextBlock Foreground="#FF606078" Margin="4,0,0,0"
+                           FontSize="10">
+                    <Run Text="("/>
+                    <Run Text="{Binding Summary, Mode=OneWay}"/>
+                    <Run Text=")"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                            <Button Content="📍 Pt" Command="{Binding AddPointProbeCommand}"
+            Padding="6,3" Margin="0,0,4,0" ToolTip="Add point probe"/>
+                            <Button Content="📏 Line" Command="{Binding AddLineProbeCommand}"
+            Padding="6,3" Margin="0,0,4,0" ToolTip="Add line probe"/>
+                            <Button Content="⚡ Eval" Command="{Binding EvaluateProbesCommand}"
+            Padding="6,3" Margin="0,0,4,0"/>
+                            <Button Content="🗑" Command="{Binding DeleteProbeCommand}"
+            Padding="6,3"/>
+                        </StackPanel>
+
+                        <!-- Probe coordinate editor (bound to SelectedProbe) -->
+                        <StackPanel DataContext="{Binding SelectedProbe}"
+            IsEnabled="{Binding DataContext.IsProbeSelected,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+            Margin="0,6,0,0">
+
+                            <TextBlock Text="Point A:" Foreground="#FF9090A0" FontSize="11"/>
+                            <Grid Margin="0,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="18"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="18"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="18"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="X" Foreground="#FFFF6060" FontSize="10"
+                   VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}" Width="58"
+                 Text="{Binding AX, StringFormat=F4, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="2" Text="Y" Foreground="#FF60FF60" FontSize="10"
+                   VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                <TextBox Grid.Column="3" Style="{StaticResource ParamTextBox}" Width="58"
+                 Text="{Binding AY, StringFormat=F4, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="4" Text="Z" Foreground="#FF6060FF" FontSize="10"
+                   VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                <TextBox Grid.Column="5" Style="{StaticResource ParamTextBox}" Width="58"
+                 Text="{Binding AZ, StringFormat=F4, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+
+                            <!-- Point B (line probes only) -->
+                            <StackPanel Visibility="{Binding DataContext.IsLineProbeSelected,
+                             RelativeSource={RelativeSource AncestorType=Window},
+                             Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock Text="Point B:" Foreground="#FF9090A0" FontSize="11" Margin="0,4,0,0"/>
+                                <Grid Margin="0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="18"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="18"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="18"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="X" Foreground="#FFFF6060" FontSize="10"
+                       VerticalAlignment="Center"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}" Width="58"
+                     Text="{Binding BX, StringFormat=F4, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Grid.Column="2" Text="Y" Foreground="#FF60FF60" FontSize="10"
+                       VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                    <TextBox Grid.Column="3" Style="{StaticResource ParamTextBox}" Width="58"
+                     Text="{Binding BY, StringFormat=F4, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Grid.Column="4" Text="Z" Foreground="#FF6060FF" FontSize="10"
+                       VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                    <TextBox Grid.Column="5" Style="{StaticResource ParamTextBox}" Width="58"
+                     Text="{Binding BZ, StringFormat=F4, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <TextBlock Text="Samples along line:" Foreground="#FF9090A0" FontSize="11"
+                   Margin="0,4,0,0"/>
+                                <Grid Margin="0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="2" Maximum="200"
+                    Value="{Binding SampleCount, Mode=TwoWay}"
+                    TickFrequency="1" IsSnapToTickEnabled="True"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}" Width="48"
+                     Text="{Binding SampleCount, StringFormat=F0,
+                            UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- ══════ SELECTED OBJECT TRANSFORM ══════ -->
+                        <TextBlock Text="SELECTED OBJECT TRANSFORM"
+               Style="{StaticResource CompactSection}" Margin="0,10,0,2"/>
+                        <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" Margin="0,0,0,6"/>
+
+                        <StackPanel IsEnabled="{Binding IsTransformEnabled}">
+
+                            <TextBlock Text="Translation" Foreground="#FF9090A0" FontSize="11"/>
+
+                            <!-- X Translation -->
+                            <Grid Margin="0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="X:" Style="{StaticResource SliderLabel}"/>
+                                <Slider Grid.Column="1" Minimum="-10" Maximum="10"
+                    Value="{Binding MovableTransform.X, Mode=TwoWay}"
+                    TickFrequency="0.01" IsSnapToTickEnabled="False"/>
+                                <TextBox Grid.Column="2" Style="{StaticResource ParamTextBox}"
+                     Text="{Binding MovableTransform.X,
+                            StringFormat=F3,
+                            UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+
+                            <!-- Y Translation -->
+                            <Grid Margin="0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Y:" Style="{StaticResource SliderLabel}"/>
+                                <Slider Grid.Column="1" Minimum="-10" Maximum="10"
+                    Value="{Binding MovableTransform.Y, Mode=TwoWay}"/>
+                                <TextBox Grid.Column="2" Style="{StaticResource ParamTextBox}"
+                     Text="{Binding MovableTransform.Y,
+                            StringFormat=F3,
+                            UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+
+                            <!-- Z Translation -->
+                            <Grid Margin="0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Z:" Style="{StaticResource SliderLabel}"/>
+                                <Slider Grid.Column="1" Minimum="-10" Maximum="10"
+                    Value="{Binding MovableTransform.Z, Mode=TwoWay}"/>
+                                <TextBox Grid.Column="2" Style="{StaticResource ParamTextBox}"
+                     Text="{Binding MovableTransform.Z,
+                            StringFormat=F3,
+                            UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+
+                            <TextBlock Text="Rotation" Foreground="#FF9090A0" FontSize="11"
+                   Margin="0,6,0,0"/>
+
+                            <!-- Rx -->
+                            <Grid Margin="0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Rx:" Style="{StaticResource SliderLabel}"/>
+                                <Slider Grid.Column="1" Minimum="-180" Maximum="180"
+                    Value="{Binding MovableTransform.RotX, Mode=TwoWay}"/>
+                                <TextBox Grid.Column="2" Style="{StaticResource ParamTextBox}"
+                     Text="{Binding MovableTransform.RotX,
+                            StringFormat=F2,
+                            UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="3" Text="°" Style="{StaticResource UnitLabel}"/>
+                            </Grid>
+
+                            <!-- Ry -->
+                            <Grid Margin="0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Ry:" Style="{StaticResource SliderLabel}"/>
+                                <Slider Grid.Column="1" Minimum="-180" Maximum="180"
+                    Value="{Binding MovableTransform.RotY, Mode=TwoWay}"/>
+                                <TextBox Grid.Column="2" Style="{StaticResource ParamTextBox}"
+                     Text="{Binding MovableTransform.RotY,
+                            StringFormat=F2,
+                            UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="3" Text="°" Style="{StaticResource UnitLabel}"/>
+                            </Grid>
+
+                            <!-- Rz -->
+                            <Grid Margin="0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Rz:" Style="{StaticResource SliderLabel}"/>
+                                <Slider Grid.Column="1" Minimum="-180" Maximum="180"
+                    Value="{Binding MovableTransform.RotZ, Mode=TwoWay}"/>
+                                <TextBox Grid.Column="2" Style="{StaticResource ParamTextBox}"
+                     Text="{Binding MovableTransform.RotZ,
+                            StringFormat=F2,
+                            UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="3" Text="°" Style="{StaticResource UnitLabel}"/>
+                            </Grid>
+
+                            <Button Content="Reset Transform"
+                Command="{Binding ResetTransformCommand}"
+                HorizontalAlignment="Left" Margin="0,6,0,0"/>
+
+                        </StackPanel>
+
+                        <!-- ══════ FIELD DISPLAY ══════ -->
+                        <TextBlock Text="FIELD DISPLAY" 
+                                   Style="{StaticResource CompactSection}" Margin="0,14,0,2"/>
+                        <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" 
+                                Margin="0,0,0,6"/>
+
+                        <!-- ══════ PATHLINES ══════ -->
+                        <TextBlock Text="PATHLINES" Style="{StaticResource CompactSection}" Margin="0,14,0,2"/>
+                        <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" Margin="0,0,0,6"/>
+
+                        <TextBlock Text="Particle type:" Foreground="#FF9090A0" FontSize="11"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,3">
+                            <RadioButton Content="Electron (e⁻)"
+                 IsChecked="{Binding PathlineIsElectron}"
+                 Foreground="#FF00DDFF" Margin="0,0,12,0" GroupName="PathlineParticle"/>
+                            <RadioButton Content="Proton (p⁺)"
+                 IsChecked="{Binding PathlineIsProton}"
+                 Foreground="#FFFF8040" GroupName="PathlineParticle"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Launch plane center:" Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
+                        <Grid Margin="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="X:" Style="{StaticResource SliderLabel}"/>
+                            <Slider Grid.Row="0" Grid.Column="1" Minimum="-10" Maximum="10"
+            Value="{Binding PathlinePlaneCenterX, Mode=TwoWay}"/>
+                            <TextBox Grid.Row="0" Grid.Column="2" Style="{StaticResource ParamTextBox}"
+             Text="{Binding PathlinePlaneCenterX, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Y:" Style="{StaticResource SliderLabel}"/>
+                            <Slider Grid.Row="1" Grid.Column="1" Minimum="-10" Maximum="10"
+            Value="{Binding PathlinePlaneCenterY, Mode=TwoWay}"/>
+                            <TextBox Grid.Row="1" Grid.Column="2" Style="{StaticResource ParamTextBox}"
+             Text="{Binding PathlinePlaneCenterY, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Z:" Style="{StaticResource SliderLabel}"/>
+                            <Slider Grid.Row="2" Grid.Column="1" Minimum="-10" Maximum="10"
+            Value="{Binding PathlinePlaneCenterZ, Mode=TwoWay}"/>
+                            <TextBox Grid.Row="2" Grid.Column="2" Style="{StaticResource ParamTextBox}"
+             Text="{Binding PathlinePlaneCenterZ, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+
+                        <TextBlock Text="Plane normal (will be normalised):" Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
+                        <Grid Margin="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Nx:" Style="{StaticResource SliderLabel}"/>
+                            <Slider Grid.Row="0" Grid.Column="1" Minimum="-1" Maximum="1"
+            Value="{Binding PathlineNormalX, Mode=TwoWay}"/>
+                            <TextBox Grid.Row="0" Grid.Column="2" Style="{StaticResource ParamTextBox}"
+             Text="{Binding PathlineNormalX, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Ny:" Style="{StaticResource SliderLabel}"/>
+                            <Slider Grid.Row="1" Grid.Column="1" Minimum="-1" Maximum="1"
+            Value="{Binding PathlineNormalY, Mode=TwoWay}"/>
+                            <TextBox Grid.Row="1" Grid.Column="2" Style="{StaticResource ParamTextBox}"
+             Text="{Binding PathlineNormalY, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Nz:" Style="{StaticResource SliderLabel}"/>
+                            <Slider Grid.Row="2" Grid.Column="1" Minimum="-1" Maximum="1"
+            Value="{Binding PathlineNormalZ, Mode=TwoWay}"/>
+                            <TextBox Grid.Row="2" Grid.Column="2" Style="{StaticResource ParamTextBox}"
+             Text="{Binding PathlineNormalZ, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+
+                        <TextBlock Text="Plane extent (width × height):" Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
+                        <Grid Margin="0,3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="W:" Style="{StaticResource SliderLabel}"/>
+                            <Slider Grid.Row="0" Grid.Column="1" Minimum="0.1" Maximum="20"
+            Value="{Binding PathlinePlaneWidth, Mode=TwoWay}"/>
+                            <TextBox Grid.Row="0" Grid.Column="2" Style="{StaticResource ParamTextBox}"
+             Text="{Binding PathlinePlaneWidth, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="H:" Style="{StaticResource SliderLabel}"/>
+                            <Slider Grid.Row="1" Grid.Column="1" Minimum="0.1" Maximum="20"
+            Value="{Binding PathlinePlaneHeight, Mode=TwoWay}"/>
+                            <TextBox Grid.Row="1" Grid.Column="2" Style="{StaticResource ParamTextBox}"
+             Text="{Binding PathlinePlaneHeight, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+
+                        <TextBlock Text="Grid density (per axis):" Foreground="#FF9090A0" FontSize="11" Margin="0,4,0,0"/>
+                        <Grid Margin="0,3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Minimum="1" Maximum="20" TickFrequency="1" IsSnapToTickEnabled="True"
+            Value="{Binding PathlineGridDensity, Mode=TwoWay}"/>
+                            <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+             Text="{Binding PathlineGridDensity, StringFormat=F0, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                        <TextBlock Foreground="#FF606078" FontSize="10" Margin="0,1,0,0">
+    <Run Text="→ "/>
+    <Run Text="{Binding PathlineGridDensity, Mode=OneWay}"/>
+    <Run Text="² = "/>
+    <Run Text="{Binding PathlineGridDensity, Mode=OneWay}"/>
+    <Run Text=" × "/>
+    <Run Text="{Binding PathlineGridDensity, Mode=OneWay}"/>
+    <Run Text=" pathlines"/>
+                        </TextBlock>
+
+                        <TextBlock Text="Initial speed (m/s):" Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
+                        <TextBox Style="{StaticResource ParamTextBox}" Width="120" HorizontalAlignment="Left" Margin="0,3"
+         Text="{Binding PathlineInitialSpeed, StringFormat=E3, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Text="Time step (s):" Foreground="#FF9090A0" FontSize="11" Margin="0,4,0,0"/>
+                        <TextBox Style="{StaticResource ParamTextBox}" Width="120" HorizontalAlignment="Left" Margin="0,3"
+         Text="{Binding PathlineTimeStep, StringFormat=E3, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Text="Max integration steps:" Foreground="#FF9090A0" FontSize="11" Margin="0,4,0,0"/>
+                        <Grid Margin="0,3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Minimum="10" Maximum="2000" TickFrequency="10" IsSnapToTickEnabled="True"
+            Value="{Binding PathlineMaxSteps, Mode=TwoWay}"/>
+                            <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+             Text="{Binding PathlineMaxSteps, StringFormat=F0, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+
+                        <Button Content="▶ Calculate Pathlines"
+        Command="{Binding CalcPathlinesCommand}"
+        HorizontalAlignment="Left" Margin="0,8,0,0" Padding="12,5"/>
+
+                        <!-- Vector arrow resolution -->
+                        <TextBlock Text="3D arrow grid density (per axis):" 
+                                   Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
+                        <Grid Margin="0,3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Minimum="2" Maximum="24" 
+                                    Value="{Binding ArrowGridDensity, Mode=TwoWay}"
+                                    TickFrequency="1" IsSnapToTickEnabled="True"/>
+                            <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                     Text="{Binding ArrowGridDensity, 
+                                            StringFormat=F0, 
+                                            UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                        <TextBlock Foreground="#FF606078" FontSize="10" Margin="0,1,0,0">
+                            <Run Text="→ "/>
+                            <Run Text="{Binding ArrowTotalCount, Mode=OneWay}"/>
+                            <Run Text=" arrows max"/>
+                        </TextBlock>
+
+                        <!-- ══════ CHARGE VOLUME ══════ -->
+                        <TextBlock Text="CHARGE VOLUME (Shape)" 
+                                   Style="{StaticResource CompactSection}" Margin="0,16,0,2"/>
+                        <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" 
+                                Margin="0,0,0,6"/>
+
+                        <TextBlock Text="Volume charge density (C/m³):" 
+                                   Foreground="#FF9090A0" FontSize="11"/>
+                        <Grid Margin="0,3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Minimum="0" Maximum="100"
+                                    Value="{Binding VolumeChargeDensity, Mode=TwoWay}"
+                                    TickFrequency="0.1" IsSnapToTickEnabled="False"/>
+                            <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                     Width="74"
+                                     Text="{Binding VolumeChargeDensity, 
+                                            StringFormat=E3, 
+                                            UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+
+                        <TextBlock Text="Charge sign:" 
+                                   Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,3">
+                            <RadioButton Content="Positive (+)" 
+                                         IsChecked="{Binding IsChargePositive}"
+                                         Foreground="#FFD0D0D0" Margin="0,0,12,0"
+                                         GroupName="ChargeSign"/>
+                            <RadioButton Content="Negative (−)" 
+                                         IsChecked="{Binding IsChargeNegative}"
+                                         Foreground="#FFD0D0D0"
+                                         GroupName="ChargeSign"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Particle count:" 
+                                   Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
+                        <Grid Margin="0,3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Minimum="1000" Maximum="10000000"
+                                    Value="{Binding ParticleCount, Mode=TwoWay}"
+                                    TickFrequency="10" IsSnapToTickEnabled="True"/>
+                            <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                     Width="68"
+                                     Text="{Binding ParticleCount, 
+                                            StringFormat=F0, 
+                                            UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                        <TextBlock Foreground="#FF606078" FontSize="10" Margin="0,1,0,0">
+                            <Run Text="Charge per particle: "/>
+                            <Run Text="{Binding ChargePerParticle, Mode=OneWay, 
+                                        StringFormat=E3}"/>
+                            <Run Text=" C"/>
+                        </TextBlock>
+
+                        <!-- ══════ TETRAHEDRALIZATION ══════ -->
+                        <TextBlock Text="TETRAHEDRALIZATION"
+               Style="{StaticResource CompactSection}" Margin="0,14,0,2"/>
+                        <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" Margin="0,0,0,6"/>
+
+                        <TextBlock Text="Charge density (charges/cm³):"
+               Foreground="#FF9090A0" FontSize="11"/>
+                        <TextBox Style="{StaticResource ParamTextBox}"
+                 Width="120" HorizontalAlignment="Left" Margin="0,3"
+                 Text="{Binding TetChargeDensity, StringFormat=E2,
+                        UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="Elementary charges per cm³ (0 – 10¹⁵)"/>
+
+                        <TextBlock Text="Inner surface charge sign:"
+               Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,3">
+                            <RadioButton Content="Inner = Positive (+)"
+                 IsChecked="{Binding IsTetInnerPositive}"
+                 Foreground="#FF60C060" Margin="0,0,12,0"
+                 GroupName="TetInnerSign"/>
+                            <RadioButton Content="Inner = Negative (−)"
+                 IsChecked="{Binding IsTetInnerNegative}"
+                 Foreground="#FFC06060"
+                 GroupName="TetInnerSign"/>
+                        </StackPanel>
+                        <TextBlock Foreground="#FF606078" FontSize="10" Margin="0,1,0,0"
+               Text="Outer surface gets the opposite sign."/>
+
+                        <TextBlock Text="Max tet volume (cm³):"
+               Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
+                        <TextBox Style="{StaticResource ParamTextBox}"
+                 Width="120" HorizontalAlignment="Left" Margin="0,3"
+                 Text="{Binding TetMaxVolumeCm3, StringFormat=E2,
+                        UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="Smaller = finer mesh, more tets, slower."/>
+
+                        <TextBlock Text="Field grid density (per axis):"
+               Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
+                        <Grid Margin="0,3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Minimum="8" Maximum="256"
+                Value="{Binding TetFieldGridDensity, Mode=TwoWay}"
+                TickFrequency="1" IsSnapToTickEnabled="True"/>
+                            <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}" Width="48"
+                 Text="{Binding TetFieldGridDensity, StringFormat=F0,
+                        UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                        <TextBlock Foreground="#FF606078" FontSize="10" Margin="0,1,0,0">
+        <Run Text="→ "/>
+        <Run Text="{Binding TetFieldGridDensity, Mode=OneWay}"/>
+        <Run Text="³ field sample points (3× mesh extent)"/>
+                        </TextBlock>
+
+                        <!-- Softening control -->
+                        <TextBlock Text="Softening α (× cell size):"
+               Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
+                        <Grid Margin="0,3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Minimum="0" Maximum="2"
+                Value="{Binding TetSofteningAlpha, Mode=TwoWay}"
+                TickFrequency="0.05" IsSnapToTickEnabled="False"/>
+                            <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}" Width="48"
+                 Text="{Binding TetSofteningAlpha, StringFormat=F2,
+                        UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                        <TextBlock Foreground="#FF606078" FontSize="10" Margin="0,1,0,0"
+               Text="0.5 = recommended. Smooths 1/r² inside mesh."/>
+
+                        <!-- Coulomb grid density -->
+                        <TextBlock Text="Coulomb grid density (per axis):"
+               Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
+                        <Grid Margin="0,3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Minimum="8" Maximum="256"
+                Value="{Binding CoulombGridDensity, Mode=TwoWay}"
+                TickFrequency="1" IsSnapToTickEnabled="True"/>
+                            <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                 Width="48"
+                 Text="{Binding CoulombGridDensity,
+                        StringFormat=F0,
+                        UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                        <TextBlock Foreground="#FF606078" FontSize="10" Margin="0,1,0,0">
+        <Run Text="→ "/>
+        <Run Text="{Binding CoulombGridDensity, Mode=OneWay}"/>
+        <Run Text="³ = "/>
+        <!-- Can't do math in XAML easily, so just show per-axis -->
+        <Run Text=" grid points per axis"/>
+                        </TextBlock>
+
+                        <!-- Action buttons -->
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="⚛ Populate Shape"
+                Command="{Binding PopulateShapeCommand}"
+                Padding="10,5" Margin="0,0,6,0" Width="125"/>
+                            <Button Content="⚡ Calculate"
+                Command="{Binding CalcParticleFieldCommand}"
+                Padding="10,5"/>
+                            <Button Content="Clear"
+                Command="{Binding ClearParticlesCommand}"
+                Padding="5,5" Margin="5,2,5,2"/>
+                        </StackPanel>
+
+                        <!-- Progress bar -->
+                        <ProgressBar Height="6" Margin="0,4,0,0"
+                 Minimum="0" Maximum="100"
+                 Value="{Binding PopulateProgress, Mode=OneWay}"
+                 Background="#FF1E1E2E"
+                 Foreground="#FF4080C0"/>
+
+                        <TextBlock Text="{Binding ParticleStatusText}"
+               Foreground="#FF8090A0" FontSize="10"
+               TextWrapping="Wrap" Margin="0,4,0,0"/>
+
+                        <!-- ══════ VOLTAGE SURFACES ══════ -->
+                        <TextBlock Text="VOLTAGE SURFACES (V∞ = 0)"
+           Style="{StaticResource CompactSection}" Margin="0,16,0,2"/>
+                        <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" Margin="0,0,0,6"/>
+
+                        <TextBlock Text="Potential is integrated radially to outside all field grids, where V = 0 (neutral ground)."
+           Foreground="#FF707088" FontSize="10" TextWrapping="Wrap" Margin="0,0,0,6"/>
+
+                        <TextBlock Text="Integration steps per path:" Foreground="#FF9090A0"
+           FontSize="11" Margin="0,2,0,0"/>
+                        <Grid Margin="0,3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Minimum="8" Maximum="512" TickFrequency="8" IsSnapToTickEnabled="True"
+            Value="{Binding VoltageIntegrationSteps, Mode=TwoWay}"/>
+                            <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+             Text="{Binding VoltageIntegrationSteps, StringFormat=F0,
+                    UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+
+                        <Button Content="⚡ Calculate Voltage"
+        Command="{Binding CalcVoltageCommand}"
+        HorizontalAlignment="Left" Margin="0,8,0,0" Padding="12,5"/>
+
+                        <!-- Voltage colour legend -->
+                        <Grid Margin="0,8,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Vmin" Foreground="#FF6060FF" FontSize="10"/>
+                            <Rectangle Grid.Column="1" Height="10" Margin="4,0">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                        <GradientStop Color="#FF00007F" Offset="0.00"/>
+                                        <GradientStop Color="#FF0000FF" Offset="0.15"/>
+                                        <GradientStop Color="#FF00FFFF" Offset="0.35"/>
+                                        <GradientStop Color="#FF00FF00" Offset="0.50"/>
+                                        <GradientStop Color="#FFFFFF00" Offset="0.65"/>
+                                        <GradientStop Color="#FFFF0000" Offset="0.85"/>
+                                        <GradientStop Color="#FF7F0000" Offset="1.00"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <TextBlock Grid.Column="2" Text="Vmax" Foreground="#FFFF6060" FontSize="10"/>
+                        </Grid>
+
+                        <TextBlock Text="{Binding VoltageStatusText}"
+           Foreground="#FF8090A0" FontSize="10"
+           TextWrapping="Wrap" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- ─── CENTER: Tabbed 3D Viewport + Probe Graph ─── -->
+            <Border Grid.Column="1" Background="#FF1A1A28" Margin="2"
+        CornerRadius="4" ClipToBounds="True">
+                <TabControl Background="#FF1A1A28"
+                BorderBrush="#FF404058"
+                SelectedIndex="{Binding CenterTabIndex, Mode=TwoWay}">
+
+                    <TabControl.Resources>
+                        <Style TargetType="TabItem">
+                            <Setter Property="Background" Value="#FF2A2A3A"/>
+                            <Setter Property="Foreground" Value="#FF9090A0"/>
+                            <Setter Property="BorderBrush" Value="#FF404058"/>
+                            <Setter Property="Padding" Value="14,5"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="TabItem">
+                                        <Border Name="Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="1,1,1,0"
+                                    Padding="{TemplateBinding Padding}"
+                                    CornerRadius="4,4,0,0" Margin="1,0">
+                                            <ContentPresenter ContentSource="Header"
+                                                  HorizontalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Border"
+                                            Property="Background" Value="#FF353548"/>
+                                                <Setter Property="Foreground" Value="#FFE0E0E0"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TabControl.Resources>
+
+                    <!-- ══════ TAB: 3D Viewport ══════ -->
+                    <TabItem Header="🔭 3D Viewport">
+                        <Grid>
+                            <helix:HelixViewport3D x:Name="Viewport3D"
+                                       Background="#FF1A1A28"
+                                       ShowCoordinateSystem="True"
+                                       CoordinateSystemLabelForeground="White"
+                                       ShowViewCube="True"
+                                       ViewCubeBackText="Back"
+                                       ViewCubeFrontText="Front"
+                                       ZoomExtentsWhenLoaded="True"
+                                       CameraRotationMode="Turntable"
+                                       InfiniteSpin="False"
+                                       IsHeadLightEnabled="True">
+
+                                <helix:HelixViewport3D.Camera>
+                                    <PerspectiveCamera Position="8,6,8"
+                                           LookDirection="-8,-6,-8"
+                                           UpDirection="0,1,0"
+                                           FieldOfView="45"/>
+                                </helix:HelixViewport3D.Camera>
+
+                                <helix:GridLinesVisual3D Width="20" Length="20"
+                                              MinorDistance="1" MajorDistance="5"
+                                              Thickness="0.05"
+                                              Fill="#20808080"/>
+
+                                <helix:LinesVisual3D Points="0,0,0 3,0,0" Color="Red" Thickness="2"/>
+                                <helix:LinesVisual3D Points="0,0,0 0,3,0" Color="Green" Thickness="2"/>
+                                <helix:LinesVisual3D Points="0,0,0 0,0,3" Color="Blue" Thickness="2"/>
+
+                                <helix:LinesVisual3D Points="{Binding PathlinePoints}"
+                                         Color="{Binding PathlineParticleColor}"
+                                         Thickness="1.5"/>
+
+                                <helix:LinesVisual3D Points="{Binding PathlinePlanePoints}"
+                                         Color="#FFFFFF00"
+                                         Thickness="1.0"/>
+
+                                <ModelVisual3D Content="{Binding SceneGroup}"/>
+                            </helix:HelixViewport3D>
+
+                            <TextBlock Text="3D VIEWPORT" Foreground="#40FFFFFF" FontSize="10"
+                           HorizontalAlignment="Left" VerticalAlignment="Top"
+                           Margin="8,4"/>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- ══════ TAB: Probe Graph ══════ -->
+                    <TabItem Header="📊 Probe Graph">
+                        <Grid Background="#FF1A1A28">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- ── Graph controls bar ── -->
+                            <Border Grid.Row="0" Background="#FF252538" Padding="8,5">
+                                <WrapPanel VerticalAlignment="Center">
+
+                                    <TextBlock Text="E-FIELD:"
+                                   Foreground="#FF80A0C0" FontSize="10"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <CheckBox Content="Total"
+                                  IsChecked="{Binding ShowProbeGraphETotal}"
+                                  Foreground="#FFDCDCEB" FontSize="10"
+                                  VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <CheckBox Content="Static"
+                                  IsChecked="{Binding ShowProbeGraphEStatic}"
+                                  Foreground="#FF5096E6" FontSize="10"
+                                  VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <CheckBox Content="Particles"
+                                  IsChecked="{Binding ShowProbeGraphEParticle}"
+                                  Foreground="#FFE6A537" FontSize="10"
+                                  VerticalAlignment="Center" Margin="0,0,14,0"/>
+
+                                    <Rectangle Width="1" Fill="#FF505068" Margin="0,2,10,2"/>
+
+                                    <TextBlock Text="VOLTAGE:"
+                                   Foreground="#FFC0A060" FontSize="10"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <CheckBox Content="Total"
+                                  IsChecked="{Binding ShowProbeGraphVTotal}"
+                                  Foreground="#FFC3C3D2" FontSize="10"
+                                  VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <CheckBox Content="Static"
+                                  IsChecked="{Binding ShowProbeGraphVStatic}"
+                                  Foreground="#FF4182D2" FontSize="10"
+                                  VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <CheckBox Content="Particles"
+                                  IsChecked="{Binding ShowProbeGraphVParticle}"
+                                  Foreground="#FFD29128" FontSize="10"
+                                  VerticalAlignment="Center" Margin="0,0,0,0"/>
+
+                                    <Rectangle Width="1" Fill="#FF505068" Margin="10,2"/>
+
+                                    <TextBlock Foreground="#FF707088" FontSize="10"
+                                   VerticalAlignment="Center">
+                            <Run Text="Solid = E (left axis)   Dashed = V (right axis)   Legend: click to toggle"/>
+                                    </TextBlock>
+                                </WrapPanel>
+                            </Border>
+
+                            <!-- ── Plot area ── -->
+                            <Grid Grid.Row="1">
+                                <!-- OxyPlot chart (add xmlns:oxy="http://oxyplot.org/wpf" to Window) -->
+                                <oxy:PlotView Model="{Binding ProbePlotModel}"
+                                  Background="#FF1A1A28"
+                                  Visibility="{Binding HasProbePlotData,
+                                               Converter={StaticResource BoolToVisibility}}"/>
+
+                                <!-- Placeholder when no data -->
+                                <StackPanel HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Visibility="{Binding HasProbePlotData,
+                                             Converter={StaticResource BoolToVisibility},
+                                             ConverterParameter=Invert}">
+                                    <TextBlock Text="📊"
+                                   FontSize="48" HorizontalAlignment="Center"
+                                   Foreground="#30FFFFFF" Margin="0,0,0,12"/>
+                                    <TextBlock Text="No line probe data to graph."
+                                   Foreground="#FF606078" FontSize="14"
+                                   HorizontalAlignment="Center"/>
+                                    <TextBlock TextWrapping="Wrap" MaxWidth="420"
+                                   Foreground="#FF505068" FontSize="11"
+                                   HorizontalAlignment="Center"
+                                   TextAlignment="Center" Margin="0,8,0,0">
+                            <Run Text="Add a 📏 Line Probe, set the A/B coordinates,"/>
+                            <LineBreak/>
+                            <Run Text="then click ⚡ Evaluate Probes."/>
+                            <LineBreak/>
+                            <Run Text="The graph shows |E| and V along the line,"/>
+                            <LineBreak/>
+                            <Run Text="broken down by static fields vs. particle charges."/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+            </Border>
+
+            <!-- ─── RIGHT PANEL: Tabs for Field Slice + Tet Statistics ─── -->
+            <Border Grid.Column="2" Background="#FF252535" Margin="2">
+                <TabControl Background="#FF252535" Foreground="#FFD0D0D0"
+                            BorderBrush="#FF404058">
+                    <TabControl.Resources>
+                        <Style TargetType="TabItem">
+                            <Setter Property="Background" Value="#FF2A2A3A"/>
+                            <Setter Property="Foreground" Value="#FF9090A0"/>
+                            <Setter Property="BorderBrush" Value="#FF404058"/>
+                            <Setter Property="Padding" Value="10,4"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="TabItem">
+                                        <Border Name="Border" Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="1,1,1,0" Padding="{TemplateBinding Padding}"
+                                                CornerRadius="4,4,0,0" Margin="1,0">
+                                            <ContentPresenter ContentSource="Header"
+                                                              HorizontalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="#FF353548"/>
+                                                <Setter Property="Foreground" Value="#FFE0E0E0"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TabControl.Resources>
+
+                    <!-- ══════ TAB 1: Field Slice (existing content) ══════ -->
+                    <TabItem Header="Field Slice">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="10,6,10,10">
+
+                                <!-- Field Slice Image -->
+                                <TextBlock Text="CUMULATIVE FIELD (PLANAR SLICE)" 
+                                           Style="{StaticResource CompactSection}"/>
+                                <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" 
+                                        Margin="0,0,0,6"/>
+
+                                <Border Background="#FF0A0A14" CornerRadius="4" 
+                                        Padding="4" Margin="0,0,0,6"
+                                        HorizontalAlignment="Center">
+                                    <Image Source="{Binding FieldSliceImage}" 
+                                           Width="310" Height="310"
+                                           RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                           Stretch="Uniform"/>
+                                </Border>
+
+                                <!-- Color scale legend -->
+                                <Grid Margin="20,0,20,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="0"
+                                               Foreground="#FF6060FF" FontSize="10"/>
+                                    <Rectangle Grid.Column="1" Height="12" Margin="4,0">
+                                        <Rectangle.Fill>
+                                            <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                                <GradientStop Color="#FF00007F" Offset="0.00"/>
+                                                <GradientStop Color="#FF0000FF" Offset="0.15"/>
+                                                <GradientStop Color="#FF00FFFF" Offset="0.35"/>
+                                                <GradientStop Color="#FF00FF00" Offset="0.50"/>
+                                                <GradientStop Color="#FFFFFF00" Offset="0.65"/>
+                                                <GradientStop Color="#FFFF0000" Offset="0.85"/>
+                                                <GradientStop Color="#FF7F0000" Offset="1.00"/>
+                                            </LinearGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <TextBlock Grid.Column="2" Text="% |E|max"
+                                               Foreground="#FFFF6060" FontSize="10"/>
+                                </Grid>
+
+                                <!-- ══════ FIELD SLICE PLANE ══════ -->
+                                <TextBlock Text="FIELD SLICE PLANE" 
+                                           Style="{StaticResource CompactSection}" Margin="0,14,0,2"/>
+                                <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" 
+                                        Margin="0,0,0,6"/>
+
+                                <TextBlock Text="Slice Axis:" Foreground="#FF9090A0" FontSize="11"/>
+                                <ComboBox SelectedIndex="{Binding SliceAxis}" Margin="0,3">
+                                    <ComboBoxItem Content="X (YZ plane)"/>
+                                    <ComboBoxItem Content="Y (XZ plane)"/>
+                                    <ComboBoxItem Content="Z (XY plane)"/>
+                                </ComboBox>
+
+                                <TextBlock Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0">
+                                    <Run Text="Slice Position ("/>
+                                    <Run Text="{Binding SliceAxisName, Mode=OneWay}"/>
+                                    <Run Text="):"/>
+                                </TextBlock>
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="-1" Maximum="1" 
+                                            Value="{Binding SlicePosition, Mode=TwoWay}"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                             Text="{Binding SlicePosition, 
+                                                    StringFormat=F3, 
+                                                    UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <TextBlock Text="Slice Resolution:" Foreground="#FF9090A0" 
+                                           FontSize="11" Margin="0,4,0,0"/>
+                                <ComboBox SelectedValue="{Binding SliceResolution}" 
+                                          SelectedValuePath="Tag" Margin="0,3">
+                                    <ComboBoxItem Tag="64" Content="64 × 64"/>
+                                    <ComboBoxItem Tag="128" Content="128 × 128" IsSelected="True"/>
+                                    <ComboBoxItem Tag="256" Content="256 × 256"/>
+                                    <ComboBoxItem Tag="512" Content="512 × 512"/>
+                                </ComboBox>
+
+                                <TextBlock Text="|E| display ceiling (% of Emax):" 
+                                           Foreground="#FF9090A0" FontSize="11"/>
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="1" Maximum="100" 
+                                            Value="{Binding EmaxDisplayPercent, Mode=TwoWay}"
+                                            TickFrequency="1" IsSnapToTickEnabled="False"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                             Text="{Binding EmaxDisplayPercent, 
+                                                    StringFormat=F1, 
+                                                    UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Grid.Column="2" Text="%" 
+                                               Style="{StaticResource UnitLabel}"/>
+                                </Grid>
+
+                                <!-- ══════ E=0 ANALYSIS ══════ -->
+                                <TextBlock Text="E-FIELD ZERO ANALYSIS"
+                                           Style="{StaticResource CompactSection}" Margin="0,14,0,2"/>
+                                <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1"
+                                        Margin="0,0,0,6"/>
+
+                                <CheckBox Content="Show E≈0 contour and points"
+                                          IsChecked="{Binding ShowZeroContour}"
+                                          Foreground="#FFD0D0D0" Margin="0,0,0,6"/>
+
+                                <TextBlock Text="Detection threshold (% of |E|max):"
+                                           Foreground="#FF9090A0" FontSize="11"
+                                           Visibility="{Binding ShowZeroContour,
+                                                        Converter={StaticResource BoolToVisibility}}"/>
+                                <Grid Margin="0,3"
+                                      Visibility="{Binding ShowZeroContour,
+                                                   Converter={StaticResource BoolToVisibility}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="0.1" Maximum="20"
+                                            Value="{Binding ZeroFieldThresholdPercent, Mode=TwoWay}"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                             Width="48"
+                                             Text="{Binding ZeroFieldThresholdPercent,
+                                                    StringFormat=F1,
+                                                    UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Grid.Column="2" Text="%" Style="{StaticResource UnitLabel}"/>
+                                </Grid>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0"
+                                            Visibility="{Binding ShowZeroContour,
+                                                         Converter={StaticResource BoolToVisibility}}">
+                                    <Ellipse Width="10" Height="10" Fill="#FF00FF50" Margin="0,0,4,0"/>
+                                    <TextBlock Text="Full E=0 (all components)"
+                                               Foreground="#FF9090A0" FontSize="10" Margin="0,0,12,0"/>
+                                    <Ellipse Width="10" Height="10" Fill="#FFFFFF00" Margin="0,0,4,0"/>
+                                    <TextBlock Text="In-plane E≈0"
+                                               Foreground="#FF9090A0" FontSize="10"/>
+                                </StackPanel>
+
+                                <TextBlock Text="{Binding ZeroPointStatusText}"
+                                           Foreground="#FF8090A0" FontSize="10"
+                                           TextWrapping="Wrap" Margin="0,6,0,0"
+                                           Visibility="{Binding ShowZeroContour,
+                                                        Converter={StaticResource BoolToVisibility}}"/>
+
+                                <!-- ══════ HIGH-RES EXPORT ══════ -->
+                                <TextBlock Text="HIGH-RESOLUTION EXPORT"
+                                           Style="{StaticResource CompactSection}" Margin="0,14,0,2"/>
+                                <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1"
+                                        Margin="0,0,0,6"/>
+
+                                <TextBlock Text="Bake resolution:"
+                                           Foreground="#FF9090A0" FontSize="11"/>
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="512" Maximum="4096"
+                                            Value="{Binding BakeResolution, Mode=TwoWay}"
+                                            TickFrequency="256" IsSnapToTickEnabled="True"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                             Width="54"
+                                             Text="{Binding BakeResolution,
+                                                    StringFormat=F0,
+                                                    UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Grid.Column="2" Text="px" Style="{StaticResource UnitLabel}"/>
+                                </Grid>
+                                <TextBlock Foreground="#FF606078" FontSize="10" Margin="0,1,0,0">
+                                    <Run Text="→ "/>
+                                    <Run Text="{Binding BakeResolution, Mode=OneWay}"/>
+                                    <Run Text="×"/>
+                                    <Run Text="{Binding BakeResolution, Mode=OneWay}"/>
+                                    <Run Text=" pixels"/>
+                                </TextBlock>
+
+                                <Button Content="💾 Bake Slice to PNG"
+                                        Command="{Binding BakeHighResSliceCommand}"
+                                        HorizontalAlignment="Left" Margin="0,8,0,0" Padding="12,5"/>
+
+                                <!-- ══════ SHAPE DEFINITION ══════ -->
+                                <TextBlock Text="ARBITRARY SHAPE DEFINITION" 
+                                           Style="{StaticResource CompactSection}" Margin="0,10,0,2"/>
+                                <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" 
+                                        Margin="0,0,0,6"/>
+
+                                <TextBlock Text="Shape Type:" Foreground="#FF9090A0" FontSize="11"/>
+                                <ComboBox ItemsSource="{Binding ShapeTypes}" 
+                                          SelectedItem="{Binding SelectedShapeType}"
+                                          Margin="0,3"/>
+
+                                <TextBlock Text="Radius:" Foreground="#FF9090A0" FontSize="11" Margin="0,4,0,0"/>
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="0.01" Maximum="5" Value="{Binding ShapeRadius}"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                             Text="{Binding ShapeRadius, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <TextBlock Text="Height:" Foreground="#FF9090A0" FontSize="11" Margin="0,4,0,0"/>
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="0.01" Maximum="10" Value="{Binding ShapeHeight}"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                             Text="{Binding ShapeHeight, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <TextBlock Text="Major Radius (torus):" Foreground="#FF9090A0" FontSize="11" Margin="0,4,0,0"/>
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="0.1" Maximum="8" Value="{Binding ShapeMajorRadius}"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                             Text="{Binding ShapeMajorRadius, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <TextBlock Text="Minor Radius (torus):" Foreground="#FF9090A0" FontSize="11" Margin="0,4,0,0"/>
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="0.01" Maximum="3" Value="{Binding ShapeMinorRadius}"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                             Text="{Binding ShapeMinorRadius, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <TextBlock Text="Angle Start:" Foreground="#FF9090A0" FontSize="11" Margin="0,4,0,0"/>
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="0" Maximum="359" Value="{Binding ShapeAngleStart}"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                             Text="{Binding ShapeAngleStart, StringFormat=F1, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Grid.Column="2" Text="°" Style="{StaticResource UnitLabel}"/>
+                                </Grid>
+
+                                <TextBlock Text="Angle Span:" Foreground="#FF9090A0" FontSize="11" Margin="0,4,0,0"/>
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="1" Maximum="360" Value="{Binding ShapeAngleSpan}"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                             Text="{Binding ShapeAngleSpan, StringFormat=F1, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Grid.Column="2" Text="°" Style="{StaticResource UnitLabel}"/>
+                                </Grid>
+
+                                <TextBlock Text="Helix Turns:" Foreground="#FF9090A0" FontSize="11" Margin="0,4,0,0"/>
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="0.25" Maximum="12" Value="{Binding ShapeHelixTurns}"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                             Text="{Binding ShapeHelixTurns, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <TextBlock Text="Helix Pitch (per turn):" Foreground="#FF9090A0" FontSize="11" Margin="0,4,0,0"/>
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="0.01" Maximum="5" Value="{Binding ShapeHelixPitch}"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
+                                             Text="{Binding ShapeHelixPitch, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- ══════ TAB 2: Tet Statistics ══════ -->
+                    <TabItem Header="Tet Statistics">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="10,6,10,10"
+                                        DataContext="{Binding LastTetStats}">
+
+                                <!-- No-data placeholder -->
+                                <TextBlock Text="No tetrahedralization data yet. Use 📐 Tetrahedralize on a mesh entry."
+                                           Foreground="#FF707088" FontSize="11"
+                                           TextWrapping="Wrap" Margin="0,0,0,10"
+                                           Visibility="{Binding DataContext.LastTetStats, 
+                                                        RelativeSource={RelativeSource AncestorType=Window},
+                                                        Converter={StaticResource BoolToVisibility}}"/>
+
+                                <!-- ── Mesh ── -->
+                                <TextBlock Text="MESH" Foreground="#FF80A0C0" FontWeight="Bold" FontSize="12" Margin="0,0,0,4"/>
+                                <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" Margin="0,0,0,6"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding MeshName}" Foreground="#FFD0D0D0" FontSize="11"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Vertices:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding VertexCount, StringFormat=N0}" Foreground="#FFD0D0D0" FontSize="11"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Triangles:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TriangleCount, StringFormat=N0}" Foreground="#FFD0D0D0" FontSize="11"/>
+                                </Grid>
+
+                                <!-- ── Grid / Tets ── -->
+                                <TextBlock Text="TETRAHEDRALIZATION" Foreground="#FF80A0C0" FontWeight="Bold" FontSize="12" Margin="0,12,0,4"/>
+                                <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" Margin="0,0,0,6"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Grid:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Foreground="#FFD0D0D0" FontSize="11">
+                                        <Run Text="{Binding GridNx, Mode=OneWay}"/>×<Run Text="{Binding GridNy, Mode=OneWay}"/>×<Run Text="{Binding GridNz, Mode=OneWay}"/>
+                                        <Run Text=" = "/><Run Text="{Binding TotalCells, Mode=OneWay, StringFormat=N0}"/>
+                                    </TextBlock>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Cell size:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CellSize, StringFormat=E3}" Foreground="#FFD0D0D0" FontSize="11"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Interior tets:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TotalInteriorTets, StringFormat=N0}" Foreground="#FF60C060" FontSize="11" FontWeight="Bold"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Fill ratio:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding FillRatioPercent, StringFormat=F1}" Foreground="#FFD0D0D0" FontSize="11"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Element vol:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding ElementVolume, StringFormat=E4}" Foreground="#FFD0D0D0" FontSize="11"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Total vol:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding TotalVolume, StringFormat=E4}" Foreground="#FFD0D0D0" FontSize="11"/>
+                                </Grid>
+
+                                <!-- ── Face Classification ── -->
+                                <TextBlock Text="FACE CLASSIFICATION" Foreground="#FF80A0C0" FontWeight="Bold" FontSize="12" Margin="0,12,0,4"/>
+                                <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" Margin="0,0,0,6"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Mode:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Foreground="#FFD0D0D0" FontSize="11">
+                                        <Run Text="{Binding IsDipoleMode, Mode=OneWay, StringFormat={}{0}}"/>
+                                    </TextBlock>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Inner faces:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding InnerFaces, StringFormat=N0}" Foreground="#FF60C060" FontSize="11"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Outer faces:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding OuterFaces, StringFormat=N0}" Foreground="#FFC06060" FontSize="11"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Neither:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding NeitherFaces, StringFormat=N0}" Foreground="#FF808080" FontSize="11"/>
+                                </Grid>
+
+                                <!-- Per-material breakdown -->
+                                <TextBlock Text="Per-material:" Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,2"/>
+                                <ItemsControl ItemsSource="{Binding MaterialBreakdown}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock FontSize="10" Foreground="#FF808098" Margin="8,1,0,1">
+                                                <Run Text="'"/><Run Text="{Binding MaterialName, Mode=OneWay}"/><Run Text="'"/>
+                                                <Run Text=" → inner:"/><Run Text="{Binding InnerCount, Mode=OneWay}" Foreground="#FF60C060"/>
+                                                <Run Text="  outer:"/><Run Text="{Binding OuterCount, Mode=OneWay}" Foreground="#FFC06060"/>
+                                                <Run Text="  other:"/><Run Text="{Binding NeitherCount, Mode=OneWay}"/>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <!-- ── Depth / Charge Sign ── -->
+                                <TextBlock Text="CHARGE SIGN DISTRIBUTION" Foreground="#FF80A0C0" FontWeight="Bold" FontSize="12" Margin="0,12,0,4"/>
+                                <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" Margin="0,0,0,6"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Raw depth:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Foreground="#FFD0D0D0" FontSize="11">
+                                        [<Run Text="{Binding RawDepthMin, Mode=OneWay, StringFormat=F4}"/>, <Run Text="{Binding RawDepthMax, Mode=OneWay, StringFormat=F4}"/>]
+                                    </TextBlock>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Vol median t*:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding VolumeMedianTStar, StringFormat=F6}" Foreground="#FFFFD040" FontSize="11"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Sign range:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Foreground="#FFD0D0D0" FontSize="11">
+                                        [<Run Text="{Binding ChargeSignMin, Mode=OneWay, StringFormat=F4}"/>, <Run Text="{Binding ChargeSignMax, Mode=OneWay, StringFormat=F4}"/>]
+                                    </TextBlock>
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Sign mean:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding ChargeSignMean, StringFormat=F4}" Foreground="#FFD0D0D0" FontSize="11"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Negative (−):" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Foreground="#FF6080FF" FontSize="11">
+                                        <Run Text="{Binding NegativeTets, Mode=OneWay, StringFormat=N0}"/>
+                                        <Run Text=" ("/>
+                                        <Run Text="{Binding NegativePercent, Mode=OneWay, StringFormat=F1}"/>
+                                        <Run Text="%)"/>
+                                    </TextBlock>
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Near-zero:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="1" Foreground="#FF808080" FontSize="11">
+                                        <Run Text="{Binding NearZeroTets, Mode=OneWay, StringFormat=N0}"/>
+                                        <Run Text=" ("/>
+                                        <Run Text="{Binding NearZeroPercent, Mode=OneWay, StringFormat=F1}"/>
+                                        <Run Text="%)"/>
+                                    </TextBlock>
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Positive (+):" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="6" Grid.Column="1" Foreground="#FFFF6060" FontSize="11">
+                                        <Run Text="{Binding PositiveTets, Mode=OneWay, StringFormat=N0}"/>
+                                        <Run Text=" ("/>
+                                        <Run Text="{Binding PositivePercent, Mode=OneWay, StringFormat=F1}"/>
+                                        <Run Text="%)"/>
+                                    </TextBlock>
+                                </Grid>
+
+                                <!-- Histogram -->
+                                <TextBlock Text="Sign histogram (−1 → +1):" Foreground="#FF9090A0" FontSize="11" Margin="0,8,0,4"/>
+                                <ItemsControl ItemsSource="{Binding ChargeSignHistogram}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,1">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="70"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="50"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding Label}" 
+                                                           Foreground="#FF808098" FontSize="10" FontFamily="Consolas"/>
+                                                <Border Grid.Column="1" Height="10" HorizontalAlignment="Left"
+                                                        Background="#FF4080C0" CornerRadius="2"
+                                                        Width="{Binding Count, 
+                                                               Converter={StaticResource CountToBarWidth},
+                                                               ConverterParameter=200}"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding Count, StringFormat=N0}"
+                                                           Foreground="#FFD0D0D0" FontSize="10" 
+                                                           HorizontalAlignment="Right" FontFamily="Consolas"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <!-- ── Charge Balance ── -->
+                                <TextBlock Text="CHARGE BALANCE" Foreground="#FF80A0C0" FontWeight="Bold" FontSize="12" Margin="0,12,0,4"/>
+                                <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" Margin="0,0,0,6"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="ρ (SI):" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding RhoSI, StringFormat=E3}" Foreground="#FFD0D0D0" FontSize="11"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="+Q:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding PositiveChargeC, StringFormat=E3}" Foreground="#FFFF6060" FontSize="11"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="−Q:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding NegativeChargeC, StringFormat=E3}" Foreground="#FF6080FF" FontSize="11"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Net:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding NetChargeC, StringFormat=E3}" Foreground="#FFFFD040" FontSize="11" FontWeight="Bold"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Imbalance:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding ImbalancePercent, StringFormat=F6}" Foreground="#FFD0D0D0" FontSize="11"/>
+                                </Grid>
+
+                                <!-- ── Field Stats ── -->
+                                <TextBlock Text="FIELD COMPUTATION" Foreground="#FF80A0C0" FontWeight="Bold" FontSize="12" Margin="0,12,0,4"/>
+                                <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" Margin="0,0,0,6"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Backend:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding BackendName}" Foreground="#FFD0D0D0" FontSize="11"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Grid:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Foreground="#FFD0D0D0" FontSize="11">
+                                        <Run Text="{Binding FieldGridDensity, Mode=OneWay}"/>³ = <Run Text="{Binding FieldGridTotal, Mode=OneWay, StringFormat=N0}"/> pts
+                                    </TextBlock>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="|E| min:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding FieldMagMin, StringFormat=E3}" Foreground="#FFD0D0D0" FontSize="11"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="|E| max:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding FieldMagMax, StringFormat=E3}" Foreground="#FFFFD040" FontSize="11" FontWeight="Bold"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="|E| mean:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding FieldMagMean, StringFormat=E3}" Foreground="#FFD0D0D0" FontSize="11"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Compute time:" Foreground="#FF9090A0" FontSize="11"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="1" Foreground="#FFD0D0D0" FontSize="11">
+                                        <Run Text="{Binding ComputeTimeSeconds, Mode=OneWay, StringFormat=F2}"/> s
+                                    </TextBlock>
+                                </Grid>
+
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- ══════ TAB 3: Probe Results ══════ -->
+                    <TabItem Header="Probes">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Auto">
+                            <StackPanel Margin="10,6,10,10">
+
+                                <TextBlock Text="PROBE RESULTS"
+                       Style="{StaticResource CompactSection}"/>
+                                <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1"
+                    Margin="0,0,0,6"/>
+
+                                <!-- Point probe or summary text -->
+                                <TextBlock Text="{Binding ProbeResultText}"
+                       Foreground="#FFB0C0D0" FontSize="11"
+                       FontFamily="Consolas"
+                       TextWrapping="Wrap"
+                       Margin="0,0,0,10"/>
+
+                                <!-- Line probe DataGrid (visible only when line probe selected + evaluated) -->
+                                <StackPanel Visibility="{Binding IsLineProbeSelected,
+                                     Converter={StaticResource BoolToVisibility}}">
+
+                                    <TextBlock Text="LINE SEGMENT SAMPLES"
+                           Foreground="#FF80A0C0" FontWeight="Bold"
+                           FontSize="12" Margin="0,0,0,4"/>
+                                    <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1"
+                        Margin="0,0,0,6"/>
+
+                                    <!-- Colour key -->
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                        <TextBlock Text="Columns: " Foreground="#FF707088" FontSize="10"/>
+                                        <TextBlock Text="Total" Foreground="#FFE0E0E0" FontSize="10"
+                               Margin="0,0,8,0"/>
+                                        <TextBlock Text="Static" Foreground="#FF80B0E0" FontSize="10"
+                               Margin="0,0,8,0"/>
+                                        <TextBlock Text="Particles" Foreground="#FFE0A040" FontSize="10"/>
+                                    </StackPanel>
+
+                                    <DataGrid ItemsSource="{Binding ProbeLineSamples}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserSortColumns="True"
+                          Background="#FF1E1E2E"
+                          Foreground="#FFD0D0D0"
+                          RowBackground="#FF252535"
+                          AlternatingRowBackground="#FF2A2A3D"
+                          BorderBrush="#FF404058"
+                          GridLinesVisibility="Horizontal"
+                          HorizontalGridLinesBrush="#FF353548"
+                          HeadersVisibility="Column"
+                          MaxHeight="500"
+                          FontSize="10"
+                          FontFamily="Consolas">
+
+                                        <DataGrid.ColumnHeaderStyle>
+                                            <Style TargetType="DataGridColumnHeader">
+                                                <Setter Property="Background" Value="#FF353548"/>
+                                                <Setter Property="Foreground" Value="#FFB0B0C0"/>
+                                                <Setter Property="Padding" Value="6,3"/>
+                                                <Setter Property="FontSize" Value="10"/>
+                                                <Setter Property="BorderBrush" Value="#FF404058"/>
+                                                <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                                            </Style>
+                                        </DataGrid.ColumnHeaderStyle>
+
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Dist (m)"
+                            Binding="{Binding DistText}" Width="72"/>
+                                            <DataGridTextColumn Header="T"
+                            Binding="{Binding T, StringFormat=F3}" Width="50"/>
+                                            <DataGridTextColumn Header="|E| Total"
+                            Binding="{Binding TotalEText}" Width="85">
+                                                <DataGridTextColumn.ElementStyle>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#FFE0E0E0"/>
+                                                    </Style>
+                                                </DataGridTextColumn.ElementStyle>
+                                            </DataGridTextColumn>
+                                            <DataGridTextColumn Header="|E| Static"
+                            Binding="{Binding StaticEText}" Width="85">
+                                                <DataGridTextColumn.ElementStyle>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#FF80B0E0"/>
+                                                    </Style>
+                                                </DataGridTextColumn.ElementStyle>
+                                            </DataGridTextColumn>
+                                            <DataGridTextColumn Header="|E| Particles"
+                            Binding="{Binding ParticleEText}" Width="85">
+                                                <DataGridTextColumn.ElementStyle>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#FFE0A040"/>
+                                                    </Style>
+                                                </DataGridTextColumn.ElementStyle>
+                                            </DataGridTextColumn>
+                                            <DataGridTextColumn Header="V Total"
+                            Binding="{Binding TotalVText}" Width="85">
+                                                <DataGridTextColumn.ElementStyle>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#FFE0E0E0"/>
+                                                    </Style>
+                                                </DataGridTextColumn.ElementStyle>
+                                            </DataGridTextColumn>
+                                            <DataGridTextColumn Header="V Static"
+                            Binding="{Binding StaticVText}" Width="85">
+                                                <DataGridTextColumn.ElementStyle>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#FF80B0E0"/>
+                                                    </Style>
+                                                </DataGridTextColumn.ElementStyle>
+                                            </DataGridTextColumn>
+                                            <DataGridTextColumn Header="V Particles"
+                            Binding="{Binding ParticleVText}" Width="85">
+                                                <DataGridTextColumn.ElementStyle>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#FFE0A040"/>
+                                                    </Style>
+                                                </DataGridTextColumn.ElementStyle>
+                                            </DataGridTextColumn>
+                                            <DataGridTextColumn Header="Position"
+                            Binding="{Binding PositionText}" Width="180"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+
+                                    <!-- Per-source detail for selected probe -->
+                                    <TextBlock Text="PER-SOURCE DETAIL (first/last samples)"
+                           Foreground="#FF80A0C0" FontWeight="Bold"
+                           FontSize="11" Margin="0,12,0,4"/>
+                                    <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1"
+                        Margin="0,0,0,6"/>
+
+                                    <ItemsControl ItemsSource="{Binding SelectedProbe.Result.Samples[0].Contributions}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock FontSize="10" Foreground="#FF808098"
+                                       Margin="4,1,0,1" FontFamily="Consolas">
+                                <Run Text="["/><Run Text="{Binding SourceCategory, Mode=OneWay}"/><Run Text="] "/>
+                                <Run Text="{Binding SourceName, Mode=OneWay}" Foreground="#FFB0B0D0"/>
+                                <LineBreak/>
+                                <Run Text="    |E|="/>
+                                <Run Text="{Binding FieldMagnitude, Mode=OneWay, StringFormat=E3}"/>
+                                <Run Text=" V/m   V="/>
+                                <Run Text="{Binding VoltageContribution, Mode=OneWay, StringFormat=E3}"/>
+                                <Run Text=" V"/>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                </TabControl>
+            </Border>
+        </Grid>
+
+        <!-- ═══ STATUS BAR ═══ -->
+        <Border Grid.Row="2" Background="#FF2A2A3A" Padding="10,4">
+            <TextBlock Text="{Binding StatusText}" 
+                       Foreground="#FF9090B0" FontSize="11"/>
+        </Border>
+    </Grid>
+</Window>

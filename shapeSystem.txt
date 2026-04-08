@@ -1,0 +1,43 @@
+# Shape Library System
+
+## Overview
+
+All parametric shapes are defined in `shapes.json`, a human-readable file
+loaded at startup by `ShapeLibrary.Load()`. The program never hard-codes
+shape geometry; adding a new shape only requires editing the JSON file and
+restarting.
+
+## How to Add a New Shape
+
+1. **Open `shapes.json`** and add a new object to the `"shapes"` array.
+
+2. **Required fields:**
+   - `"name"` — unique string; appears in the UI dropdown and is stored
+     in `ArbitraryShapeParams.Type`. Must not collide with existing names.
+   - `"patches"` — array of one or more surface patches (see below).
+
+3. **Optional fields:**
+   - `"volume"` — expression for the analytical volume (used for charge
+     density → charge-per-particle). Defaults to 1.0 if omitted.
+
+4. **If the shape needs particle population** (charge volumes), add a case
+   to `ParticlePopulator.IsInsideShape()` and `GetShapeBounds()` with the
+   same `"name"` string.
+
+5. **Restart the application.** The new shape appears in the dropdown.
+
+## Patch Definition
+
+Each patch is a `(u, v)` parametric surface mapped to 3D:
+
+```json
+{
+  "uDomain":    ["<expr>", "<expr>"],   // [uMin, uMax]
+  "vDomain":    ["<expr>", "<expr>"],   // [vMin, vMax]
+  "uSegments":  "<expr>",              // tessellation along u
+  "vSegments":  "<expr>",              // tessellation along v
+  "x":          "<expr>",              // x(u, v)
+  "y":          "<expr>",              // y(u, v)
+  "z":          "<expr>",              // z(u, v)
+  "flipWinding": false                 // optional; reverses triangle winding
+}
