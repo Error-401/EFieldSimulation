@@ -1,7 +1,8 @@
 ﻿namespace EFieldSimulation.Models;
 
 /// <summary>
-/// Serialization DTO for probe definitions (saved in project manifest).
+/// Serialization DTO for probe definitions (saved in 
+/// manifest).
 /// </summary>
 public sealed class ProbeDto
 {

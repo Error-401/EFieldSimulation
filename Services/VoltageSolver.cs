@@ -232,12 +232,10 @@ public static class VoltageSolver
                           $"Center=({p.CenterX},{p.CenterY},{p.CenterZ}), " +
                           $"RotX={entry.Transform.RotX}, RotY={entry.Transform.RotY}, RotZ={entry.Transform.RotZ}");
 
-        // Shape-local rotation now comes from the entry's transform, not ShapeParams
+        // bug
         var shapeRot = BuildShapeLocalRotation(p, entry.Transform);
         var entryMat = entry.Transform.ToMatrix4x4();
 
-        // Since rotation is now in shapeRot AND in entryMat, we need to avoid
-        // double-applying. Use translation-only from entryMat:
         var translationOnly = Matrix4x4.CreateTranslation(
             entry.Transform.X, entry.Transform.Y, entry.Transform.Z);
         var full = shapeRot * translationOnly;

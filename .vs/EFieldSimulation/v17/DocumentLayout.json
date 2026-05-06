@@ -3,20 +3,76 @@
   "WorkspaceRootPath": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\efieldsimulation.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:efieldsimulation.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\viewmodels\\mainviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:viewmodels\\mainviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\services\\meshtetrahedralizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:services\\meshtetrahedralizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\viewmodels\\sceneobjectviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:viewmodels\\sceneobjectviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\helpers\\interpolationhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:helpers\\interpolationhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\services\\projectserializer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:services\\projectserializer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\models\\probedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:models\\probedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\models\\electricfielddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:models\\electricfielddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\models\\arbitraryshape.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:models\\arbitraryshape.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\services\\voltagesolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:services\\voltagesolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\app.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
       "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:app.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\services\\meshtetrahedralizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:services\\meshtetrahedralizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\services\\projectserializer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:services\\projectserializer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\viewmodels\\baseviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:viewmodels\\baseviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\services\\fieldsuperposition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:services\\fieldsuperposition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\models\\transformstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:models\\transformstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\models\\shapedefinitions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:models\\shapedefinitions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\compute\\icomputebackend.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -27,24 +83,8 @@
       "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:services\\coulombsolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\viewmodels\\mainviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:viewmodels\\mainviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\viewmodels\\sceneobjectviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:viewmodels\\sceneobjectviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\models\\shapelibrary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:models\\shapelibrary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\models\\arbitraryshape.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:models\\arbitraryshape.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\models\\shapedefinitions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:models\\shapedefinitions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\models\\sceneobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -59,10 +99,6 @@
       "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:models\\sceneentry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\models\\probedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:models\\probedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\models\\probedefinition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:models\\probedefinition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -75,16 +111,8 @@
       "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:models\\meshdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\models\\electricfielddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:models\\electricfielddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\helpers\\mathhelpers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:helpers\\mathhelpers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\helpers\\interpolationhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:helpers\\interpolationhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\converters\\counttobarwidthconverter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -107,24 +135,8 @@
       "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:compute\\coulombkernels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\models\\transformstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:models\\transformstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\converters\\booltovisibilityconverter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:converters\\booltovisibilityconverter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\efieldsimulation.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:efieldsimulation.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\services\\voltagesolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:services\\voltagesolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\rendering\\meshrenderer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -143,20 +155,12 @@
       "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:compute\\gridspec.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\services\\fieldsuperposition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:services\\fieldsuperposition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\services\\pathlinesolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:services\\pathlinesolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\services\\meshimporter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:services\\meshimporter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|solutionrelative:mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{22D694B6-0AA2-42A4-8E8F-F1152E91046E}|EFieldSimulation.csproj|c:\\users\\mcgui\\documents\\particlesimproject\\efieldsimulation\\services\\zerofieldfinder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -202,11 +206,27 @@
       "DocumentGroups": [
         {
           "DockedHeight": 200,
-          "SelectedChildIndex": 48,
+          "SelectedChildIndex": 15,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "BaseViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\ViewModels\\BaseViewModel.cs",
+              "RelativeDocumentMoniker": "ViewModels\\BaseViewModel.cs",
+              "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\ViewModels\\BaseViewModel.cs",
+              "RelativeToolTip": "ViewModels\\BaseViewModel.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-08T21:37:45.261Z"
             },
             {
               "$type": "Document",
@@ -216,26 +236,27 @@
               "RelativeDocumentMoniker": "Services\\MeshTetrahedralizer.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\MeshTetrahedralizer.cs",
               "RelativeToolTip": "Services\\MeshTetrahedralizer.cs",
-              "ViewState": "AQIAAAUAAAAAAAAAAAAuwAwAAAAAAAAA",
+              "ViewState": "AQIAAGoAAAAAAAAAAAArwG4AAAAnAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-09T17:47:26.582Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "ArbitraryShape.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\ArbitraryShape.cs",
               "RelativeDocumentMoniker": "Models\\ArbitraryShape.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\ArbitraryShape.cs",
               "RelativeToolTip": "Models\\ArbitraryShape.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAYwAgAAAAnAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAcAAAAnAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-09T17:47:12.632Z"
+              "WhenOpened": "2026-03-09T17:47:12.632Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 17,
               "Title": "ShapeDefinitions.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\ShapeDefinitions.cs",
               "RelativeDocumentMoniker": "Models\\ShapeDefinitions.cs",
@@ -247,57 +268,58 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 4,
               "Title": "SceneObjectViewModel.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\ViewModels\\SceneObjectViewModel.cs",
               "RelativeDocumentMoniker": "ViewModels\\SceneObjectViewModel.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\ViewModels\\SceneObjectViewModel.cs",
               "RelativeToolTip": "ViewModels\\SceneObjectViewModel.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAAmAAAA",
+              "ViewState": "AQIAACQAAAAAAAAAAAAowAYAAAAmAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-16T12:06:41.086Z"
+              "WhenOpened": "2026-03-16T12:06:41.086Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 8,
               "Title": "ProbeDto.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\ProbeDto.cs",
               "RelativeDocumentMoniker": "Models\\ProbeDto.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\ProbeDto.cs",
               "RelativeToolTip": "Models\\ProbeDto.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAQAAAAEAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-23T15:30:23.971Z"
+              "WhenOpened": "2026-03-23T15:30:23.971Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 1,
               "Title": "EFieldSimulation.csproj",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\EFieldSimulation.csproj",
               "RelativeDocumentMoniker": "EFieldSimulation.csproj",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\EFieldSimulation.csproj",
               "RelativeToolTip": "EFieldSimulation.csproj",
-              "ViewState": "AQIAAAkAAAAAAAAAAAAAABYAAAA+AAAA",
+              "ViewState": "AQIAAAIAAAAAAAAAAAAAABEAAAA4AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
               "WhenOpened": "2026-03-23T15:29:58.352Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 13,
               "Title": "ProjectSerializer.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\ProjectSerializer.cs",
               "RelativeDocumentMoniker": "Services\\ProjectSerializer.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\ProjectSerializer.cs",
               "RelativeToolTip": "Services\\ProjectSerializer.cs",
-              "ViewState": "AQIAAPsBAAAAAAAAAAAmwAYCAABOAAAA",
+              "ViewState": "AQIAAGwAAAAAAAAAAAAMwHYAAAAZAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-17T14:21:53.922Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-17T14:21:53.922Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 20,
               "Title": "ShapeLibrary.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\ShapeLibrary.cs",
               "RelativeDocumentMoniker": "Models\\ShapeLibrary.cs",
@@ -309,7 +331,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 45,
+              "DocumentIndex": 46,
               "Title": "ProbeRenderer.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Rendering\\ProbeRenderer.cs",
               "RelativeDocumentMoniker": "Rendering\\ProbeRenderer.cs",
@@ -321,7 +343,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 46,
+              "DocumentIndex": 47,
               "Title": "ProbeSolver.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\ProbeSolver.cs",
               "RelativeDocumentMoniker": "Services\\ProbeSolver.cs",
@@ -333,7 +355,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 22,
               "Title": "ProbeResult.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\ProbeResult.cs",
               "RelativeDocumentMoniker": "Models\\ProbeResult.cs",
@@ -345,7 +367,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 24,
               "Title": "ProbeDefinition.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\ProbeDefinition.cs",
               "RelativeDocumentMoniker": "Models\\ProbeDefinition.cs",
@@ -357,54 +379,57 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 0,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\MainWindow.xaml",
               "RelativeDocumentMoniker": "MainWindow.xaml",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\MainWindow.xaml",
               "RelativeToolTip": "MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-03-09T23:44:51.873Z"
+              "WhenOpened": "2026-03-09T23:44:51.873Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 2,
               "Title": "MainViewModel.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\ViewModels\\MainViewModel.cs",
               "RelativeDocumentMoniker": "ViewModels\\MainViewModel.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\ViewModels\\MainViewModel.cs",
               "RelativeToolTip": "ViewModels\\MainViewModel.cs",
-              "ViewState": "AQIAABsGAAAAAAAAAAAUwCQGAAAWAAAA",
+              "ViewState": "AQIAAH0AAAAAAAAAAAAuwIYAAAAhAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-09T23:47:39.771Z"
+              "WhenOpened": "2026-03-09T23:47:39.771Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 35,
+              "DocumentIndex": 15,
               "Title": "FieldSuperposition.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\FieldSuperposition.cs",
               "RelativeDocumentMoniker": "Services\\FieldSuperposition.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\FieldSuperposition.cs",
               "RelativeToolTip": "Services\\FieldSuperposition.cs",
-              "ViewState": "AQIAAMkAAAAAAAAAAAA7wNIAAAABAAAA",
+              "ViewState": "AQIAAM0AAAAAAAAAAAAowNIAAAABAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-09T16:08:13.782Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 11,
               "Title": "VoltageSolver.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\VoltageSolver.cs",
               "RelativeDocumentMoniker": "Services\\VoltageSolver.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\VoltageSolver.cs",
               "RelativeToolTip": "Services\\VoltageSolver.cs",
-              "ViewState": "AQIAAJwAAAAAAAAAAAAWwKQAAAAgAAAA",
+              "ViewState": "AQIAAOQAAAAAAAAAAAAUwPAAAAAuAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-09T17:47:28.712Z"
+              "WhenOpened": "2026-03-09T17:47:28.712Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 23,
               "Title": "SceneEntry.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\SceneEntry.cs",
               "RelativeDocumentMoniker": "Models\\SceneEntry.cs",
@@ -416,31 +441,31 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 33,
               "Title": "BoolToVisibilityConverter.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Converters\\BoolToVisibilityConverter.cs",
               "RelativeDocumentMoniker": "Converters\\BoolToVisibilityConverter.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Converters\\BoolToVisibilityConverter.cs",
               "RelativeToolTip": "Converters\\BoolToVisibilityConverter.cs",
-              "ViewState": "AQIAAAIAAAAAAAAAAAAAAAkAAAAmAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAABBwAkAAAAmAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-11T12:41:05.964Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 26,
               "Title": "MeshData.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\MeshData.cs",
               "RelativeDocumentMoniker": "Models\\MeshData.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\MeshData.cs",
               "RelativeToolTip": "Models\\MeshData.cs",
-              "ViewState": "AQIAAAYAAAAAAAAAAIBJwCIAAAABAAAA",
+              "ViewState": "AQIAAAMAAAAAAAAAAIBZwCIAAAABAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-09T17:47:14.712Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
+              "DocumentIndex": 37,
               "Title": "GridSpec.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Compute\\GridSpec.cs",
               "RelativeDocumentMoniker": "Compute\\GridSpec.cs",
@@ -452,7 +477,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 29,
               "Title": "SourceBuffer.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Compute\\SourceBuffer.cs",
               "RelativeDocumentMoniker": "Compute\\SourceBuffer.cs",
@@ -464,7 +489,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 31,
               "Title": "FieldBuffer.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Compute\\FieldBuffer.cs",
               "RelativeDocumentMoniker": "Compute\\FieldBuffer.cs",
@@ -476,7 +501,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 9,
               "Title": "ElectricFieldData.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\ElectricFieldData.cs",
               "RelativeDocumentMoniker": "Models\\ElectricFieldData.cs",
@@ -484,23 +509,24 @@
               "RelativeToolTip": "Models\\ElectricFieldData.cs",
               "ViewState": "AQIAAHwAAAAAAAAAAAAuwI4AAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-09T17:47:14.198Z"
+              "WhenOpened": "2026-03-09T17:47:14.198Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 21,
               "Title": "SceneObject.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\SceneObject.cs",
               "RelativeDocumentMoniker": "Models\\SceneObject.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\SceneObject.cs",
               "RelativeToolTip": "Models\\SceneObject.cs",
-              "ViewState": "AQIAAAwAAAAAAAAAAIAxwAwAAAAYAAAA",
+              "ViewState": "AQIAAA0AAAAAAAAAAADgvwwAAAAYAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-09T17:47:16.387Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 27,
               "Title": "MathHelpers.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Helpers\\MathHelpers.cs",
               "RelativeDocumentMoniker": "Helpers\\MathHelpers.cs",
@@ -512,19 +538,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 16,
               "Title": "TransformState.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\TransformState.cs",
               "RelativeDocumentMoniker": "Models\\TransformState.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\TransformState.cs",
               "RelativeToolTip": "Models\\TransformState.cs",
-              "ViewState": "AQIAAFAAAAAAAAAAAAAqwFEAAAA0AAAA",
+              "ViewState": "AQIAAB4AAAAAAAAAAAAIwCYAAAAuAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-09T17:47:18.556Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 19,
               "Title": "CoulombSolver.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\CoulombSolver.cs",
               "RelativeDocumentMoniker": "Services\\CoulombSolver.cs",
@@ -536,7 +562,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 18,
               "Title": "IComputeBackend.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Compute\\IComputeBackend.cs",
               "RelativeDocumentMoniker": "Compute\\IComputeBackend.cs",
@@ -548,19 +574,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 30,
               "Title": "GpuComputeBackend.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Compute\\GpuComputeBackend.cs",
               "RelativeDocumentMoniker": "Compute\\GpuComputeBackend.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Compute\\GpuComputeBackend.cs",
               "RelativeToolTip": "Compute\\GpuComputeBackend.cs",
-              "ViewState": "AQIAAAYAAAAAAAAAAAAAAO0BAAABAAAA",
+              "ViewState": "AQIAAAMAAAAAAAAAAIBJwO0BAAABAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-11T13:53:51.408Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 32,
               "Title": "CoulombKernels.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Compute\\CoulombKernels.cs",
               "RelativeDocumentMoniker": "Compute\\CoulombKernels.cs",
@@ -572,20 +598,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 12,
               "Title": "App.xaml",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\App.xaml",
               "RelativeDocumentMoniker": "App.xaml",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\App.xaml",
               "RelativeToolTip": "App.xaml",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "ViewState": "AQIAACEAAAAAAAAAAAAkwCwAAAAbAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2026-03-20T12:19:31.287Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
+              "DocumentIndex": 36,
               "Title": "ShapeGenerator.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\ShapeGenerator.cs",
               "RelativeDocumentMoniker": "Services\\ShapeGenerator.cs",
@@ -597,7 +623,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 40,
+              "DocumentIndex": 41,
               "Title": "ParticleRenderer.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Rendering\\ParticleRenderer.cs",
               "RelativeDocumentMoniker": "Rendering\\ParticleRenderer.cs",
@@ -609,7 +635,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 43,
+              "DocumentIndex": 44,
               "Title": "ParticlePopulator.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\ParticlePopulator.cs",
               "RelativeDocumentMoniker": "Services\\ParticlePopulator.cs",
@@ -621,7 +647,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 36,
+              "DocumentIndex": 38,
               "Title": "PathlineSolver.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\PathlineSolver.cs",
               "RelativeDocumentMoniker": "Services\\PathlineSolver.cs",
@@ -633,19 +659,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 35,
               "Title": "TransformViewModel.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\ViewModels\\TransformViewModel.cs",
               "RelativeDocumentMoniker": "ViewModels\\TransformViewModel.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\ViewModels\\TransformViewModel.cs",
               "RelativeToolTip": "ViewModels\\TransformViewModel.cs",
-              "ViewState": "AQIAAAYAAAAAAAAAAIBJwEgAAAAoAAAA",
+              "ViewState": "AQIAAAMAAAAAAAAAAIBZwEgAAAAoAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-16T12:06:42.055Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 44,
+              "DocumentIndex": 45,
               "Title": "VoltageSurfaceRenderer.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Rendering\\VoltageSurfaceRenderer.cs",
               "RelativeDocumentMoniker": "Rendering\\VoltageSurfaceRenderer.cs",
@@ -657,19 +683,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 41,
+              "DocumentIndex": 42,
               "Title": "Hdf5FieldWriter.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\Hdf5FieldWriter.cs",
               "RelativeDocumentMoniker": "Services\\Hdf5FieldWriter.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\Hdf5FieldWriter.cs",
               "RelativeToolTip": "Services\\Hdf5FieldWriter.cs",
-              "ViewState": "AQIAAA0AAAAAAAAAAIBJwE0AAABAAAAA",
+              "ViewState": "AQIAAAoAAAAAAAAAAIBZwE0AAABAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-17T14:22:53.248Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 25,
               "Title": "ParticleCloud.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\ParticleCloud.cs",
               "RelativeDocumentMoniker": "Models\\ParticleCloud.cs",
@@ -681,7 +707,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 39,
+              "DocumentIndex": 40,
               "Title": "ZeroFieldFinder.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\ZeroFieldFinder.cs",
               "RelativeDocumentMoniker": "Services\\ZeroFieldFinder.cs",
@@ -693,7 +719,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 37,
+              "DocumentIndex": 39,
               "Title": "MeshImporter.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\MeshImporter.cs",
               "RelativeDocumentMoniker": "Services\\MeshImporter.cs",
@@ -705,31 +731,31 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 42,
+              "DocumentIndex": 43,
               "Title": "FieldExporter.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\FieldExporter.cs",
               "RelativeDocumentMoniker": "Services\\FieldExporter.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Services\\FieldExporter.cs",
               "RelativeToolTip": "Services\\FieldExporter.cs",
-              "ViewState": "AQIAAAwAAAAAAAAAAIBJwB4AAAAPAAAA",
+              "ViewState": "AQIAAAkAAAAAAAAAAIBZwB4AAAAPAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-17T14:22:26.042Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
+              "DocumentIndex": 34,
               "Title": "MeshRenderer.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Rendering\\MeshRenderer.cs",
               "RelativeDocumentMoniker": "Rendering\\MeshRenderer.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Rendering\\MeshRenderer.cs",
               "RelativeToolTip": "Rendering\\MeshRenderer.cs",
-              "ViewState": "AQIAAAMAAAAAAAAAAIBJwA4AAAAMAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAIBZwA4AAAAMAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-09T17:47:20.062Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 28,
               "Title": "CountToBarWidthConverter.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Converters\\CountToBarWidthConverter.cs",
               "RelativeDocumentMoniker": "Converters\\CountToBarWidthConverter.cs",
@@ -741,31 +767,32 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 47,
+              "DocumentIndex": 48,
               "Title": "TetStatistics.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\TetStatistics.cs",
               "RelativeDocumentMoniker": "Models\\TetStatistics.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Models\\TetStatistics.cs",
               "RelativeToolTip": "Models\\TetStatistics.cs",
-              "ViewState": "AQIAADkAAAAAAAAAAAA6wAkAAAAhAAAA",
+              "ViewState": "AQIAADoAAAAAAAAAAAA4wAkAAAAhAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-20T17:34:56.49Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 38,
+              "DocumentIndex": 5,
               "Title": "MainWindow.xaml.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "MainWindow.xaml.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\MainWindow.xaml.cs",
               "RelativeToolTip": "MainWindow.xaml.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABEAAAAjAAAA",
+              "ViewState": "AQIAAAYAAAAAAAAAAIBJwA4AAAAFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-09T16:09:49.17Z"
+              "WhenOpened": "2026-03-09T16:09:49.17Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 6,
               "Title": "InterpolationHelper.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\Helpers\\InterpolationHelper.cs",
               "RelativeDocumentMoniker": "Helpers\\InterpolationHelper.cs",
@@ -773,17 +800,18 @@
               "RelativeToolTip": "Helpers\\InterpolationHelper.cs",
               "ViewState": "AQIAAAMAAAAAAAAAAIBJwA0AAAAcAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-10T13:18:35.872Z"
+              "WhenOpened": "2026-03-10T13:18:35.872Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 7,
               "Title": "App.xaml.cs",
               "DocumentMoniker": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\App.xaml.cs",
               "RelativeDocumentMoniker": "App.xaml.cs",
               "ToolTip": "C:\\Users\\mcgui\\Documents\\ParticleSimProject\\EFieldSimulation\\App.xaml.cs",
               "RelativeToolTip": "App.xaml.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAABAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAABAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-18T13:08:09.52Z",
               "EditorCaption": ""

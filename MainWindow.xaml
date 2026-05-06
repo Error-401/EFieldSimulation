@@ -885,7 +885,7 @@
                                          Thickness="1.5"/>
 
                                 <helix:LinesVisual3D Points="{Binding PathlinePlanePoints}"
-                                         Color="#FFFFFF00"
+                                         Color="#666666"
                                          Thickness="1.0"/>
 
                                 <ModelVisual3D Content="{Binding SceneGroup}"/>
@@ -923,7 +923,7 @@
                                   VerticalAlignment="Center" Margin="0,0,8,0"/>
                                     <CheckBox Content="Particles"
                                   IsChecked="{Binding ShowProbeGraphEParticle}"
-                                  Foreground="#FFE6A537" FontSize="10"
+                                  Foreground="#FFD29128" FontSize="10"
                                   VerticalAlignment="Center" Margin="0,0,14,0"/>
 
                                     <Rectangle Width="1" Fill="#FF505068" Margin="0,2,10,2"/>

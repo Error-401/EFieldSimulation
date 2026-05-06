@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EFieldSimulation")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bf77d55e8f5f8b9a757c9cf91e1052bed1d03356")]
 [assembly: System.Reflection.AssemblyProductAttribute("EFieldSimulation")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EFieldSimulation")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

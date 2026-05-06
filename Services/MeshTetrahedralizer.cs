@@ -9,7 +9,7 @@ public static class MeshTetrahedralizer
 {
     private const double Ke = 8.9875517923e9;
     private const double E_CHARGE = 1.602176634e-19;
-    private const float FieldPadding = 1.15f;
+    private const float FieldPadding = 1.75f;//1.15
 
     private static readonly string[] InnerKeys = { "inner", "bore", "interior", "cavity" };
     private static readonly string[] OuterKeys = { "outer", "exterior", "shell", "surface" };

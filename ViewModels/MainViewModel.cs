@@ -133,7 +133,7 @@ public sealed class MainViewModel : BaseViewModel
     public double TetChargeDensity
     {
         get => _tetChargeDensity;
-        set => SetProperty(ref _tetChargeDensity, Math.Clamp(value, 0, 1e15));
+        set => SetProperty(ref _tetChargeDensity, Math.Clamp(value, 0, 1e17));
     }
 
     private int _tetFieldGridDensity = 96;
