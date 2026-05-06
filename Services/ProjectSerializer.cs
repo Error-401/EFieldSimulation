@@ -278,7 +278,9 @@ public static class ProjectSerializer
 
     private static void WriteMeshBlob(ZipArchive zip, string entryName, MeshData mesh)
     {
-        var ze = zip.CreateEntry(entryName, CompressionLevel.Optimal);
+        // Mesh blobs are already compact binary data. Avoid expensive ZIP deflate
+        // so project files load faster. Field blobs stay compressed elsewhere.
+        var ze = zip.CreateEntry(entryName, CompressionLevel.NoCompression);
         using var stream = ze.Open();
         using var bw = new BinaryWriter(stream, Encoding.UTF8, leaveOpen: false);
 

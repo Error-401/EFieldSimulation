@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Input;
@@ -69,6 +70,9 @@ public sealed class MainViewModel : BaseViewModel
         get => _sceneGroup;
         set => SetProperty(ref _sceneGroup, value);
     }
+
+    // Caches converted WPF mesh geometry so scene rebuilds do not repeatedly reprocess the same mesh data.
+    private readonly Dictionary<MeshData, MeshGeometry3D> _meshGeometryCache = new();
 
     private WriteableBitmap? _fieldSliceImage;
     public WriteableBitmap? FieldSliceImage
@@ -1116,12 +1120,16 @@ public sealed class MainViewModel : BaseViewModel
         if (_selectedEntry == null) return;
         var name = _selectedEntry.Name;
         _selectedEntry.PropertyChanged -= OnEntryPropertyChanged;
+
+        // Removes cached geometry for deleted meshes so unused render data does not stay in memory.
+        if (_selectedEntry.Mesh != null)
+            _meshGeometryCache.Remove(_selectedEntry.Mesh);
+
         SceneEntries.Remove(_selectedEntry);
         SelectedEntry = SceneEntries.FirstOrDefault();
         StatusText = $"Deleted: {name}";
         RebuildScene(); UpdateFieldSlice();
     }
-
     // ── Populate / Calc / Clear ──────────────────────────────
 
     private void OnPopulateShape()
@@ -2016,18 +2024,38 @@ public sealed class MainViewModel : BaseViewModel
         SceneGroup = group;
     }
 
-    private static GeometryModel3D BuildMeshModel(SceneEntry entry)
+   // Converts MeshData to WPF geometry once and reuses it on future scene rebuilds.
+    private MeshGeometry3D GetCachedMeshGeometry(MeshData mesh)
+    {
+        if (_meshGeometryCache.TryGetValue(mesh, out var cached))
+            return cached;
+
+        var geo = mesh.ToMeshGeometry3D();
+
+        if (geo.CanFreeze)
+            geo.Freeze();
+
+        _meshGeometryCache[mesh] = geo;
+        return geo;
+    }
+
+    // Builds the visible 3D model using cached mesh geometry while still applying each entry's current transform.
+    private GeometryModel3D BuildMeshModel(SceneEntry entry)
     {
         bool movable = entry.Kind == SceneEntryKind.Movable;
         var color = movable ? Color.FromArgb(200, 220, 150, 60) : Color.FromArgb(200, 100, 130, 180);
         var back = movable ? Color.FromArgb(150, 180, 120, 40) : Color.FromArgb(150, 80, 100, 140);
-        var geo = entry.Mesh!.ToMeshGeometry3D();
+
+        var geo = GetCachedMeshGeometry(entry.Mesh!);
+
         var mat = new MaterialGroup();
         mat.Children.Add(new DiffuseMaterial(new SolidColorBrush(color)));
         mat.Children.Add(new SpecularMaterial(Brushes.White, 30));
+
         return new GeometryModel3D
         {
-            Geometry = geo, Material = mat,
+            Geometry = geo,
+            Material = mat,
             BackMaterial = new DiffuseMaterial(new SolidColorBrush(back)),
             Transform = entry.Transform.ToWpfTransform()
         };
@@ -2444,9 +2472,14 @@ public sealed class MainViewModel : BaseViewModel
             var (manifest, entries) = ProjectSerializer.Load(dlg.FileName);
 
             // Clear current scene
-            foreach (var e in SceneEntries)
-                e.PropertyChanged -= OnEntryPropertyChanged;
-            SceneEntries.Clear();
+        foreach (var e in SceneEntries)
+            e.PropertyChanged -= OnEntryPropertyChanged;
+
+        // Clears cached geometry from the previous project before loading the new scene entries.
+        _meshGeometryCache.Clear();
+
+        SceneEntries.Clear();
+        SelectedEntry = null;
             SelectedEntry = null;
             IsPopulated = false;
             PathlinePoints = new System.Windows.Media.Media3D.Point3DCollection();
