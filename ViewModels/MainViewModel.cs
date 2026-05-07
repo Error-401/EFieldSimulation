@@ -15,6 +15,8 @@ using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using OxyPlot.Legends;
+using System.Runtime.CompilerServices;
+using System.IO;
 
 namespace EFieldSimulation.ViewModels;
 
@@ -711,6 +713,12 @@ public sealed class MainViewModel : BaseViewModel
     private System.Windows.Threading.DispatcherTimer? _coulombTimer;
     private bool _coulombRecalcInFlight;
 
+    public string GetProjectRoot([CallerFilePath] string sourceFilePath = "")
+    {
+        // Returns the directory containing this source file
+        return Path.GetDirectoryName(sourceFilePath);
+    }
+
     // ═════════════════════════════════════════════════════════
     public MainViewModel()
     {
@@ -718,7 +726,7 @@ public sealed class MainViewModel : BaseViewModel
         try
         {
             ShapeLibrary.Load(System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory, "shapes.json"));
+                GetProjectRoot(), "shapes.json"));
             _selectedShapeType = ShapeLibrary.ShapeNames.Contains(_selectedShapeType)
                 ? _selectedShapeType
                 : ShapeLibrary.ShapeNames.FirstOrDefault() ?? _selectedShapeType;
