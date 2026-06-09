@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "EFieldSimulation": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

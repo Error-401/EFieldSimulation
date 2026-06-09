@@ -130,6 +130,8 @@ public static class PathlineSolver
             // source and point inward (toward the source), which is the opposite of
             // the convention, so we flip to restore consistent outward-from-positive
             // orientation before qOverM applies the particle's own sign.
+
+            // This may actually cause bugs, so use cautiously
             float orientationFlip;
             if (chargeSign < -0.5f)
             {

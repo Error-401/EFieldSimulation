@@ -39,4 +39,10 @@ public sealed class ArbitraryShapeParams
     public double VolChargeDensity { get; set; } = 1.0;
     public bool IsPositive { get; set; } = true;
     public int VolParticleCount { get; set; } = 1000;
+
+    /// <summary>Whether charge is specified as density or surface field strength.</summary>
+    public ChargeInputMode InputMode { get; set; } = ChargeInputMode.VolumeDensity;
+
+    /// <summary>Target average surface |E| in V/m. Only used when InputMode == SurfaceFieldStrength.</summary>
+    public double SurfaceFieldStrength { get; set; }
 }

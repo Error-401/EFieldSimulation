@@ -495,6 +495,8 @@ public sealed class ProjectManifest
     public double TetChargeDensity { get; set; } = 1e15;
     public int TetFieldGridDensity { get; set; } = 96;
     public bool IsTetInnerPositive { get; set; } = true;
+    public int TetChargeInputMode { get; set; }
+    public double TetSurfaceFieldStrength { get; set; }
     public int CoulombGridDensity { get; set; } = 96;
 
     // Pathline parameters

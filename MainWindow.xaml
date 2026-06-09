@@ -67,7 +67,7 @@
                 ToolTip="Export selected entry's E-field to standalone HDF5"/>
 
                 <Rectangle Width="1" Fill="#FF505068" Margin="8,2"/>
-                
+
                 <TextBlock Text="SCENE:" Style="{StaticResource SectionHeader}"
                Margin="0,0,8,0" VerticalAlignment="Center"/>
 
@@ -578,9 +578,44 @@
                         <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" 
                                 Margin="0,0,0,6"/>
 
-                        <TextBlock Text="Volume charge density (C/m³):" 
+                        <!-- ══ Charge input mode ══ -->
+                        <TextBlock Text="Charge input mode:"
+                                   Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,3">
+                            <RadioButton Content="ρ  (C/m³)"
+                                         IsChecked="{Binding IsVolumeDensityMode}"
+                                         Foreground="#FFD0D0D0" Margin="0,0,14,0"
+                                         GroupName="ChargeInputMode"
+                                         ToolTip="Specify volume charge density directly"/>
+                            <RadioButton Content="E surface  (V/m)"
+                                         IsChecked="{Binding IsSurfaceFieldMode}"
+                                         Foreground="#FFD0D0D0"
+                                         GroupName="ChargeInputMode"
+                                         ToolTip="Specify target average field strength at the surface; density is derived via Gauss's law"/>
+                        </StackPanel>
+
+                        <!-- ── Surface field strength input (field mode) ── -->
+                        <StackPanel Visibility="{Binding IsSurfaceFieldMode,
+                                    Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Text="Target avg. surface |E| (V/m):"
+                                       Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
+                            <TextBox Style="{StaticResource ParamTextBox}"
+                                     Width="120" HorizontalAlignment="Left" Margin="0,3"
+                                     Text="{Binding SurfaceFieldStrength,
+                                            StringFormat=E3,
+                                            UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Average |E| at the surface from Gauss's law: E ≈ ρV/(ε₀A)"/>
+                            <TextBlock Foreground="#FF606078" FontSize="10" Margin="0,2,0,0">
+                                <Run Text="→  ρ = "/>
+                                <Run Text="{Binding VolumeChargeDensity, Mode=OneWay, StringFormat=E3}"/>
+                                <Run Text=" C/m³  (Gauss)"/>
+                            </TextBlock>
+                        </StackPanel>
+
+                        <!-- ── Volume charge density (editable in density mode, read-only info in field mode) ── -->
+                        <TextBlock Text="Volume charge density (C/m³):"
                                    Foreground="#FF9090A0" FontSize="11"/>
-                        <Grid Margin="0,3">
+                        <Grid Margin="0,3" IsEnabled="{Binding IsVolumeDensityMode}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
@@ -590,19 +625,39 @@
                                     TickFrequency="0.1" IsSnapToTickEnabled="False"/>
                             <TextBox Grid.Column="1" Style="{StaticResource ParamTextBox}"
                                      Width="74"
-                                     Text="{Binding VolumeChargeDensity, 
-                                            StringFormat=E3, 
+                                     Text="{Binding VolumeChargeDensity,
+                                            StringFormat=E3,
                                             UpdateSourceTrigger=PropertyChanged}"/>
                         </Grid>
 
-                        <TextBlock Text="Charge sign:" 
+                        <!-- Equivalent field display (density mode) -->
+                        <TextBlock Foreground="#FF606078" FontSize="10" Margin="0,2,0,0"
+                                   Visibility="{Binding IsVolumeDensityMode,
+                                                Converter={StaticResource BoolToVisibility}}">
+                            <Run Text="≈  "/>
+                            <Run Text="{Binding SurfaceFieldStrength, Mode=OneWay, StringFormat=E3}"/>
+                            <Run Text=" V/m avg. at surface"/>
+                        </TextBlock>
+
+                        <!-- Geometry info (always visible when shape is selected) -->
+                        <TextBlock Foreground="#FF505068" FontSize="9" Margin="0,4,0,0"
+                                   Visibility="{Binding SelectedHasShape,
+                                                Converter={StaticResource BoolToVisibility}}">
+                            <Run Text="A = "/>
+                            <Run Text="{Binding EstimatedSurfaceArea, Mode=OneWay, StringFormat=E3}"/>
+                            <Run Text=" m²     V/A = "/>
+                            <Run Text="{Binding CharacteristicLength, Mode=OneWay, StringFormat=E3}"/>
+                            <Run Text=" m"/>
+                        </TextBlock>
+
+                        <TextBlock Text="Charge sign:"
                                    Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>
                         <StackPanel Orientation="Horizontal" Margin="0,3">
-                            <RadioButton Content="Positive (+)" 
+                            <RadioButton Content="Positive (+)"
                                          IsChecked="{Binding IsChargePositive}"
                                          Foreground="#FFD0D0D0" Margin="0,0,12,0"
                                          GroupName="ChargeSign"/>
-                            <RadioButton Content="Negative (−)" 
+                            <RadioButton Content="Negative (−)"
                                          IsChecked="{Binding IsChargeNegative}"
                                          Foreground="#FFD0D0D0"
                                          GroupName="ChargeSign"/>
@@ -631,18 +686,71 @@
                             <Run Text=" C"/>
                         </TextBlock>
 
-                        <!-- ══════ TETRAHEDRALIZATION ══════ -->
-                        <TextBlock Text="TETRAHEDRALIZATION"
-               Style="{StaticResource CompactSection}" Margin="0,14,0,2"/>
-                        <Border BorderBrush="#FF404058" BorderThickness="0,0,0,1" Margin="0,0,0,6"/>
+                        <!-- ══ Tet charge input mode ══ -->
+                        <TextBlock Text="Charge input mode:"
+                                   Foreground="#FF9090A0" FontSize="11" Margin="0,4,0,0"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,3">
+                            <RadioButton Content="charges/cm³"
+                                         IsChecked="{Binding IsTetVolumeDensityMode}"
+                                         Foreground="#FFD0D0D0" Margin="0,0,14,0"
+                                         GroupName="TetChargeInputMode"
+                                         ToolTip="Specify charge density in elementary charges per cm³"/>
+                            <RadioButton Content="E surface (V/m)"
+                                         IsChecked="{Binding IsTetSurfaceFieldMode}"
+                                         Foreground="#FFD0D0D0"
+                                         GroupName="TetChargeInputMode"
+                                         ToolTip="Specify target average surface |E|; density derived via Gauss's law from mesh geometry"/>
+                        </StackPanel>
 
+                        <!-- ── Surface field target (tet field mode) ── -->
+                        <StackPanel Visibility="{Binding IsTetSurfaceFieldMode,
+                                    Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Text="Target avg. surface |E| (V/m):"
+                                       Foreground="#FF9090A0" FontSize="11" Margin="0,4,0,0"/>
+                            <TextBox Style="{StaticResource ParamTextBox}"
+                                     Width="120" HorizontalAlignment="Left" Margin="0,3"
+                                     Text="{Binding TetSurfaceFieldStrength,
+                                            StringFormat=E3,
+                                            UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Average |E| at mesh surface via Gauss: E ≈ ρV/(ε₀A). Both inner and outer faces use this target."/>
+                            <TextBlock Foreground="#FF606078" FontSize="10" Margin="0,2,0,0">
+                                <Run Text="→  "/>
+                                <Run Text="{Binding TetChargeDensity, Mode=OneWay, StringFormat=E3}"/>
+                                <Run Text=" charges/cm³  (Gauss)"/>
+                            </TextBlock>
+                        </StackPanel>
+
+                        <!-- ── Charge density (editable in density mode, info in field mode) ── -->
                         <TextBlock Text="Charge density (charges/cm³):"
-               Foreground="#FF9090A0" FontSize="11"/>
+                                   Foreground="#FF9090A0" FontSize="11"/>
                         <TextBox Style="{StaticResource ParamTextBox}"
-                 Width="120" HorizontalAlignment="Left" Margin="0,3"
-                 Text="{Binding TetChargeDensity, StringFormat=E2,
-                        UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="Elementary charges per cm³ (0 – 10¹⁵)"/>
+                                 Width="120" HorizontalAlignment="Left" Margin="0,3"
+                                 IsEnabled="{Binding IsTetVolumeDensityMode}"
+                                 Text="{Binding TetChargeDensity, StringFormat=E2,
+                                        UpdateSourceTrigger=PropertyChanged}"
+                                 ToolTip="Elementary charges per cm³ (0 – 10¹⁵)"/>
+
+                        <!-- Equivalent E display (density mode only) -->
+                        <TextBlock Foreground="#FF606078" FontSize="10" Margin="0,2,0,0"
+                                   Visibility="{Binding IsTetVolumeDensityMode,
+                                               Converter={StaticResource BoolToVisibility}}">
+                            <Run Text="≈  "/>
+                            <Run Text="{Binding TetSurfaceFieldStrength, Mode=OneWay, StringFormat=E3}"/>
+                            <Run Text=" V/m avg. at surface"/>
+                        </TextBlock>
+
+                        <!-- Mesh geometry readout (visible when selected entry has a mesh) -->
+                        <TextBlock Foreground="#FF505068" FontSize="9" Margin="0,4,0,2"
+                                   Visibility="{Binding HasMeshGeometry,
+                                               Converter={StaticResource BoolToVisibility}}">
+                            <Run Text="Mesh: A = "/>
+                            <Run Text="{Binding TetMeshSurfaceArea, Mode=OneWay, StringFormat=E3}"/>
+                            <Run Text=" m²   V = "/>
+                            <Run Text="{Binding TetMeshVolume, Mode=OneWay, StringFormat=E3}"/>
+                            <Run Text=" m³   V/A = "/>
+                            <Run Text="{Binding TetCharacteristicLength, Mode=OneWay, StringFormat=E3}"/>
+                            <Run Text=" m"/>
+                        </TextBlock>
 
                         <TextBlock Text="Inner surface charge sign:"
                Foreground="#FF9090A0" FontSize="11" Margin="0,6,0,0"/>

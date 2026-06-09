@@ -120,6 +120,12 @@ public sealed class MainViewModel : BaseViewModel
     /// <summary>Flat list of samples from the selected line probe, for DataGrid binding.</summary>
     public ObservableCollection<ProbePointSample> ProbeLineSamples { get; } = new();
 
+    // ── New backing fields ───────────────────────────────────
+    private ChargeInputMode _chargeInputMode = ChargeInputMode.VolumeDensity;
+    private double _surfaceFieldStrength;
+    private double _estimatedSurfaceArea;
+    private bool _syncingCharge;
+
     // ── Tetrahedralization parameters ────────────────────────
 
     private double _tetMaxVolumeCm3 = 0.01;
@@ -130,11 +136,11 @@ public sealed class MainViewModel : BaseViewModel
     }
 
     private double _tetChargeDensity = 1e15;
-    public double TetChargeDensity
+    /*public double TetChargeDensity
     {
         get => _tetChargeDensity;
         set => SetProperty(ref _tetChargeDensity, Math.Clamp(value, 0, 1e17));
-    }
+    }*/
 
     private int _tetFieldGridDensity = 96;
     public int TetFieldGridDensity
@@ -496,18 +502,26 @@ public sealed class MainViewModel : BaseViewModel
     public double VolumeChargeDensity
     {
         get => _volumeChargeDensity;
-        set { if (SetProperty(ref _volumeChargeDensity, value))
-        { Proxy(p => p.VolChargeDensity = value); OnPropertyChanged(nameof(ChargePerParticle)); } }
+        set
+        {
+            if (SetProperty(ref _volumeChargeDensity, value))
+                Proxy(p => p.VolChargeDensity = value);
+        }
     }
 
     private bool _isChargePositive = true;
     public bool IsChargePositive
     {
         get => _isChargePositive;
-        set { if (SetProperty(ref _isChargePositive, value))
-        { Proxy(p => p.IsPositive = value);
-          OnPropertyChanged(nameof(IsChargeNegative));
-          OnPropertyChanged(nameof(ChargePerParticle)); } }
+        set
+        {
+            if (SetProperty(ref _isChargePositive, value))
+            {
+                Proxy(p => p.IsPositive = value);
+                OnPropertyChanged(nameof(IsChargeNegative));
+                OnPropertyChanged(nameof(ChargePerParticle));
+            }
+        }
     }
     public bool IsChargeNegative { get => !_isChargePositive; set => IsChargePositive = !value; }
 
@@ -515,8 +529,11 @@ public sealed class MainViewModel : BaseViewModel
     public int ParticleCount
     {
         get => _particleCount;
-        set { if (SetProperty(ref _particleCount, Math.Max(1, value)))
-        { Proxy(p => p.VolParticleCount = value); OnPropertyChanged(nameof(ChargePerParticle)); } }
+        set
+        {
+            if (SetProperty(ref _particleCount, Math.Max(1, value)))
+            { Proxy(p => p.VolParticleCount = value); OnPropertyChanged(nameof(ChargePerParticle)); }
+        }
     }
 
     public double ChargePerParticle
@@ -554,48 +571,66 @@ public sealed class MainViewModel : BaseViewModel
     public double ShapeRadius
     {
         get => _shapeRadius;
-        set { _shapeRadius = value; Proxy(p => { p.Radius = value; p.SphereRadius = value; });
-              OnPropertyChanged(); OnPropertyChanged(nameof(ChargePerParticle)); RebuildScene(); }
+        set
+        {
+            _shapeRadius = value; Proxy(p => { p.Radius = value; p.SphereRadius = value; });
+            OnPropertyChanged(); OnPropertyChanged(nameof(ChargePerParticle)); RebuildScene();
+        }
     }
 
     private double _shapeHeight = 2.0;
     public double ShapeHeight
     {
         get => _shapeHeight;
-        set { _shapeHeight = value; Proxy(p => { p.Height = value; p.ConeHeight = value; });
-              OnPropertyChanged(); OnPropertyChanged(nameof(ChargePerParticle)); RebuildScene(); }
+        set
+        {
+            _shapeHeight = value; Proxy(p => { p.Height = value; p.ConeHeight = value; });
+            OnPropertyChanged(); OnPropertyChanged(nameof(ChargePerParticle)); RebuildScene();
+        }
     }
 
     private double _shapeMajorRadius = 2.0;
     public double ShapeMajorRadius
     {
         get => _shapeMajorRadius;
-        set { _shapeMajorRadius = value; Proxy(p => p.MajorRadius = value);
-              OnPropertyChanged(); OnPropertyChanged(nameof(ChargePerParticle)); RebuildScene(); }
+        set
+        {
+            _shapeMajorRadius = value; Proxy(p => p.MajorRadius = value);
+            OnPropertyChanged(); OnPropertyChanged(nameof(ChargePerParticle)); RebuildScene();
+        }
     }
 
     private double _shapeMinorRadius = 0.5;
     public double ShapeMinorRadius
     {
         get => _shapeMinorRadius;
-        set { _shapeMinorRadius = value; Proxy(p => p.MinorRadius = value);
-              OnPropertyChanged(); OnPropertyChanged(nameof(ChargePerParticle)); RebuildScene(); }
+        set
+        {
+            _shapeMinorRadius = value; Proxy(p => p.MinorRadius = value);
+            OnPropertyChanged(); OnPropertyChanged(nameof(ChargePerParticle)); RebuildScene();
+        }
     }
 
     private double _shapeAngleStart;
     public double ShapeAngleStart
     {
         get => _shapeAngleStart;
-        set { _shapeAngleStart = value; Proxy(p => p.AngleStartDeg = value);
-              OnPropertyChanged(); RebuildScene(); }
+        set
+        {
+            _shapeAngleStart = value; Proxy(p => p.AngleStartDeg = value);
+            OnPropertyChanged(); RebuildScene();
+        }
     }
 
     private double _shapeAngleSpan = 360;
     public double ShapeAngleSpan
     {
         get => _shapeAngleSpan;
-        set { _shapeAngleSpan = value; Proxy(p => p.AngleSpanDeg = value);
-              OnPropertyChanged(); RebuildScene(); }
+        set
+        {
+            _shapeAngleSpan = value; Proxy(p => p.AngleSpanDeg = value);
+            OnPropertyChanged(); RebuildScene();
+        }
     }
 
     private double _shapeCenterX, _shapeCenterY, _shapeCenterZ;
@@ -659,10 +694,191 @@ public sealed class MainViewModel : BaseViewModel
         set { _shapeRotZ = value; Proxy(p => p.RotationZ = value); OnPropertyChanged(); RebuildScene(); }
     }*/
 
+    public ChargeInputMode ChargeInputMode
+    {
+        get => _chargeInputMode;
+        set
+        {
+            if (!SetProperty(ref _chargeInputMode, value)) return;
+            if (!_isLoadingShape && ActiveShapeParams != null)
+                ActiveShapeParams.InputMode = value;
+
+            OnPropertyChanged(nameof(IsVolumeDensityMode));
+            OnPropertyChanged(nameof(IsSurfaceFieldMode));
+
+            // Switching TO field mode: seed field from current density
+            // so RefreshChargeDisplay doesn't overwrite density with a stale/zero E
+            if (value == ChargeInputMode.SurfaceFieldStrength
+                && ActiveShapeParams != null && !_syncingCharge)
+            {
+                double vol = ShapeLibrary.EvaluateVolume(ActiveShapeParams);
+                double area = SurfaceFieldConverter.ComputeSurfaceArea(ActiveShapeParams);
+                _surfaceFieldStrength = SurfaceFieldConverter.ChargeDensityToFieldStrength(
+                    _volumeChargeDensity, vol, area);
+                OnPropertyChanged(nameof(SurfaceFieldStrength));
+            }
+
+            RefreshChargeDisplay();
+        }
+    }
+    public bool IsVolumeDensityMode
+    {
+        get => _chargeInputMode == ChargeInputMode.VolumeDensity;
+        set { if (value) ChargeInputMode = ChargeInputMode.VolumeDensity; }
+    }
+
+    public bool IsSurfaceFieldMode
+    {
+        get => _chargeInputMode == ChargeInputMode.SurfaceFieldStrength;
+        set { if (value) ChargeInputMode = ChargeInputMode.SurfaceFieldStrength; }
+    }
+    public double SurfaceFieldStrength
+    {
+        get => _surfaceFieldStrength;
+        set
+        {
+            if (!SetProperty(ref _surfaceFieldStrength, value)) return;
+            if (!_isLoadingShape && ActiveShapeParams != null)
+                ActiveShapeParams.SurfaceFieldStrength = value;
+            if (!_syncingCharge)
+                RefreshChargeDisplay();
+        }
+    }
+
+    public double EstimatedSurfaceArea
+    {
+        get => _estimatedSurfaceArea;
+        private set => SetProperty(ref _estimatedSurfaceArea, value);
+    }
+    public double CharacteristicLength =>
+        _estimatedSurfaceArea > 1e-30 && ActiveShapeParams != null
+            ? ShapeLibrary.EvaluateVolume(ActiveShapeParams) / _estimatedSurfaceArea
+            : 0;
+
     /// Writes to the selected entry's ShapeParams if present and not loading
     private void Proxy(Action<ArbitraryShapeParams> action)
     {
-        if (!_isLoadingShape && ActiveShapeParams != null) action(ActiveShapeParams);
+        if (_isLoadingShape || ActiveShapeParams == null) return;
+        action(ActiveShapeParams);
+        RefreshChargeDisplay();
+    }
+
+    // Core sync: computes surface area, then either derives ρ from E
+    // (field mode) or derives E from ρ (density mode).
+
+    private void RefreshChargeDisplay()
+    {
+        if (_syncingCharge || _isLoadingShape || ActiveShapeParams == null) return;
+        _syncingCharge = true;
+        try
+        {
+            double volume = ShapeLibrary.EvaluateVolume(ActiveShapeParams);
+            double area = SurfaceFieldConverter.ComputeSurfaceArea(ActiveShapeParams);
+            _estimatedSurfaceArea = area;
+
+            if (_chargeInputMode == ChargeInputMode.SurfaceFieldStrength)
+            {
+                // Authoritative input: _surfaceFieldStrength → derive density
+                double rho = SurfaceFieldConverter.FieldStrengthToChargeDensity(
+                    _surfaceFieldStrength, volume, area);
+                _volumeChargeDensity = rho;
+                ActiveShapeParams.VolChargeDensity = rho;
+                OnPropertyChanged(nameof(VolumeChargeDensity));
+            }
+            else
+            {
+                // Authoritative input: _volumeChargeDensity → derive field
+                double e = SurfaceFieldConverter.ChargeDensityToFieldStrength(
+                    _volumeChargeDensity, volume, area);
+                _surfaceFieldStrength = e;
+                OnPropertyChanged(nameof(SurfaceFieldStrength));
+            }
+
+            OnPropertyChanged(nameof(EstimatedSurfaceArea));
+            OnPropertyChanged(nameof(CharacteristicLength));
+            OnPropertyChanged(nameof(ChargePerParticle));
+        }
+        finally { _syncingCharge = false; }
+    }
+
+    public ChargeInputMode TetChargeInputMode
+    {
+        get => _tetChargeInputMode;
+        set
+        {
+            if (!SetProperty(ref _tetChargeInputMode, value)) return;
+            OnPropertyChanged(nameof(IsTetVolumeDensityMode));
+            OnPropertyChanged(nameof(IsTetSurfaceFieldMode));
+
+            // Switching TO field mode: seed from current density
+            if (value == ChargeInputMode.SurfaceFieldStrength
+                && !_syncingTetCharge
+                && _tetMeshVolume > 1e-30 && _tetMeshSurfaceArea > 1e-30)
+            {
+                _tetSurfaceFieldStrength =
+                    SurfaceFieldConverter.ChargesPerCm3ToFieldStrength(
+                        _tetChargeDensity, _tetMeshVolume, _tetMeshSurfaceArea);
+                OnPropertyChanged(nameof(TetSurfaceFieldStrength));
+            }
+
+            RefreshTetChargeDisplay();
+        }
+    }
+
+    public bool IsTetVolumeDensityMode
+    {
+        get => _tetChargeInputMode == ChargeInputMode.VolumeDensity;
+        set { if (value) TetChargeInputMode = ChargeInputMode.VolumeDensity; }
+    }
+
+    public bool IsTetSurfaceFieldMode
+    {
+        get => _tetChargeInputMode == ChargeInputMode.SurfaceFieldStrength;
+        set { if (value) TetChargeInputMode = ChargeInputMode.SurfaceFieldStrength; }
+    }
+
+    // ── Tet surface field strength ───────────────────────────
+
+    public double TetSurfaceFieldStrength
+    {
+        get => _tetSurfaceFieldStrength;
+        set
+        {
+            if (SetProperty(ref _tetSurfaceFieldStrength, value))
+                if (!_syncingTetCharge) RefreshTetChargeDisplay();
+        }
+    }
+
+    // ── Mesh geometry (read-only, computed) ──────────────────
+
+    public double TetMeshSurfaceArea
+    {
+        get => _tetMeshSurfaceArea;
+        private set => SetProperty(ref _tetMeshSurfaceArea, value);
+    }
+
+    public double TetMeshVolume
+    {
+        get => _tetMeshVolume;
+        private set => SetProperty(ref _tetMeshVolume, value);
+    }
+
+    public double TetCharacteristicLength =>
+        _tetMeshSurfaceArea > 1e-30 ? _tetMeshVolume / _tetMeshSurfaceArea : 0;
+
+    public bool HasMeshGeometry => _selectedEntry?.Mesh != null;
+
+    // ── Modified: TetChargeDensity setter ────────────────────
+    // Now triggers tet charge display refresh.
+
+    public double TetChargeDensity
+    {
+        get => _tetChargeDensity;
+        set
+        {
+            if (SetProperty(ref _tetChargeDensity, Math.Clamp(value, 0, 1e17)))
+                if (!_syncingTetCharge) RefreshTetChargeDisplay();
+        }
     }
 
     // ── Status ───────────────────────────────────────────────
@@ -706,6 +922,12 @@ public sealed class MainViewModel : BaseViewModel
     private bool _coulombRecalcPending;
     private System.Windows.Threading.DispatcherTimer? _coulombTimer;
     private bool _coulombRecalcInFlight;
+
+    private ChargeInputMode _tetChargeInputMode = ChargeInputMode.VolumeDensity;
+    private double _tetSurfaceFieldStrength;
+    private double _tetMeshSurfaceArea;
+    private double _tetMeshVolume;
+    private bool _syncingTetCharge;
 
     // ═════════════════════════════════════════════════════════
     public MainViewModel()
@@ -853,6 +1075,9 @@ public sealed class MainViewModel : BaseViewModel
         if (entry?.ShapeParams != null)
             LoadShapeFromEntry(entry);
         OnPropertyChanged(nameof(SelectedHasShape));
+
+        // Update mesh geometry display for tet controls
+        RefreshTetChargeDisplay();
     }
 
     private void LoadShapeFromEntry(SceneEntry entry)
@@ -870,6 +1095,15 @@ public sealed class MainViewModel : BaseViewModel
             _shapeAngleSpan = p.AngleSpanDeg; OnPropertyChanged(nameof(ShapeAngleSpan));
             _shapeHelixTurns = p.HelixTurns; OnPropertyChanged(nameof(ShapeHelixTurns));
             _shapeHelixPitch = p.HelixPitch; OnPropertyChanged(nameof(ShapeHelixPitch));
+
+            // ── charge input mode + field strength ──
+            _chargeInputMode = p.InputMode;
+            OnPropertyChanged(nameof(ChargeInputMode));
+            OnPropertyChanged(nameof(IsVolumeDensityMode));
+            OnPropertyChanged(nameof(IsSurfaceFieldMode));
+            _surfaceFieldStrength = p.SurfaceFieldStrength;
+            OnPropertyChanged(nameof(SurfaceFieldStrength));
+
             _volumeChargeDensity = p.VolChargeDensity; OnPropertyChanged(nameof(VolumeChargeDensity));
             _isChargePositive = p.IsPositive;
             OnPropertyChanged(nameof(IsChargePositive));
@@ -877,7 +1111,11 @@ public sealed class MainViewModel : BaseViewModel
             _particleCount = p.VolParticleCount; OnPropertyChanged(nameof(ParticleCount));
             OnPropertyChanged(nameof(ChargePerParticle));
         }
-        finally { _isLoadingShape = false; }
+        finally
+        {
+            _isLoadingShape = false;
+            RefreshChargeDisplay();
+        }
     }
 
     // ── Entry creation ───────────────────────────────────────
@@ -1050,16 +1288,49 @@ public sealed class MainViewModel : BaseViewModel
                 _selectedEntry.NotifyContentChanged();
                 RebuildScene();
             }
-            catch (Exception ex) { StatusText = $"Import error: {ex.Message}"; _tetInFlight = false; return; }
+            catch (Exception ex)
+            {
+                StatusText = $"Import error: {ex.Message}";
+                _tetInFlight = false;
+                return;
+            }
         }
 
         var meshData = _selectedEntry.Mesh!;
-        StatusText = $"Tetrahedralizing '{meshData.Name}' ({_tetChargeDensity:E1}/cm³, " +
+
+        // ── Refresh geometry display and compute effective density ──
+        RefreshTetChargeDisplay();
+
+        double effectiveDensity;
+        string densitySource;
+
+        if (_tetChargeInputMode == ChargeInputMode.SurfaceFieldStrength
+            && _tetMeshSurfaceArea > 1e-30 && _tetMeshVolume > 1e-30)
+        {
+            effectiveDensity = SurfaceFieldConverter.FieldStrengthToChargesPerCm3(
+                _tetSurfaceFieldStrength, _tetMeshVolume, _tetMeshSurfaceArea);
+            densitySource = $"(from E_target={_tetSurfaceFieldStrength:E3} V/m, " +
+                            $"A={_tetMeshSurfaceArea:E3} m², V_mesh={_tetMeshVolume:E3} m³)";
+
+            Console.WriteLine($"[Tet] Surface-field mode:");
+            Console.WriteLine($"  E_target       : {_tetSurfaceFieldStrength:E3} V/m");
+            Console.WriteLine($"  Mesh area      : {_tetMeshSurfaceArea:E3} m²");
+            Console.WriteLine($"  Mesh volume    : {_tetMeshVolume:E3} m³");
+            Console.WriteLine($"  Char. length   : {_tetMeshVolume / _tetMeshSurfaceArea:E3} m");
+            Console.WriteLine($"  → charges/cm³  : {effectiveDensity:E3}");
+        }
+        else
+        {
+            effectiveDensity = _tetChargeDensity;
+            densitySource = "(direct input)";
+        }
+
+        StatusText = $"Tetrahedralizing '{meshData.Name}' ({effectiveDensity:E1}/cm³ {densitySource}, " +
                      $"max vol {_tetMaxVolumeCm3:E2} cm³, {_tetFieldGridDensity}³ grid)…";
         PopulateProgress = 0;
 
         var maxVol = _tetMaxVolumeCm3;
-        var density = _tetChargeDensity;
+        var density = effectiveDensity;
         var fGrid = _tetFieldGridDensity;
         var innerPos = _isTetInnerPositive;
         var progress = new Progress<double>(p => PopulateProgress = p * 100);
@@ -1079,8 +1350,37 @@ public sealed class MainViewModel : BaseViewModel
 
             LastTetStats = stats;
 
+            // ── Post-tet verification (surface-field mode) ──
+            if (_tetChargeInputMode == ChargeInputMode.SurfaceFieldStrength)
+            {
+                double meshArea = SurfaceFieldConverter.ComputeMeshSurfaceArea(meshData);
+                double actualE = SurfaceFieldConverter.ChargeDensityToFieldStrength(
+                    stats.RhoSI, stats.TotalVolume, meshArea);
+                double pctDiff = _tetSurfaceFieldStrength > 1e-30
+                    ? Math.Abs(actualE - _tetSurfaceFieldStrength)
+                      / _tetSurfaceFieldStrength * 100
+                    : 0;
+
+                Console.WriteLine();
+                Console.WriteLine("── Surface-field verification ──");
+                Console.WriteLine($"  Target E       : {_tetSurfaceFieldStrength:E3} V/m");
+                Console.WriteLine($"  Gauss estimate : {actualE:E3} V/m " +
+                                  $"(using tet vol={stats.TotalVolume:E3} m³)");
+                Console.WriteLine($"  Vol. ratio     : mesh {_tetMeshVolume:E3} / " +
+                                  $"tet {stats.TotalVolume:E3} = " +
+                                  $"{_tetMeshVolume / stats.TotalVolume:F3}");
+                Console.WriteLine($"  Deviation      : {pctDiff:F1}%");
+
+                StatusText = $"Done: {field.Description} — " +
+                             $"E_target≈{_tetSurfaceFieldStrength:E2} V/m, " +
+                             $"Gauss check≈{actualE:E2} V/m ({pctDiff:F1}% dev)";
+            }
+            else
+            {
+                StatusText = $"Done: {field.Description}";
+            }
+
             PopulateProgress = 100;
-            StatusText = $"Done: {field.Description}";
             UpdateFieldSlice();
             RebuildScene();
         }
@@ -1188,18 +1488,16 @@ public sealed class MainViewModel : BaseViewModel
     private void BalanceChargeDensities(List<SceneEntry> volumes)
     {
         double posTotal = 0, negTotal = 0;
-
         foreach (var entry in volumes)
         {
             var sp = entry.ShapeParams!;
             double vol = ShapeLibrary.EvaluateVolume(sp);
             double mag = Math.Abs(sp.VolChargeDensity) * vol;
-            if (sp.IsPositive) posTotal += mag;
-            else negTotal += mag;
+            if (sp.IsPositive) posTotal += mag; else negTotal += mag;
         }
 
         if (posTotal < 1e-30 && negTotal < 1e-30) return;
-        if (posTotal < 1e-30 || negTotal < 1e-30) return; // one side is zero; nothing to balance against
+        if (posTotal < 1e-30 || negTotal < 1e-30) return;
 
         double diff = posTotal - negTotal;
         if (Math.Abs(diff) < 1e-30 * Math.Max(posTotal, negTotal))
@@ -1208,7 +1506,6 @@ public sealed class MainViewModel : BaseViewModel
             return;
         }
 
-        // Scale down the larger side
         bool scalePositive = posTotal > negTotal;
         double alpha = scalePositive ? negTotal / posTotal : posTotal / negTotal;
 
@@ -1216,21 +1513,79 @@ public sealed class MainViewModel : BaseViewModel
         {
             var sp = entry.ShapeParams!;
             if (sp.IsPositive == scalePositive)
-            {
                 sp.VolChargeDensity *= alpha;
-            }
         }
 
         string side = scalePositive ? "positive" : "negative";
         Console.WriteLine($"  Volume charge balance: scaled {side} densities by α={alpha:F10}");
 
-        // Refresh UI if selected entry was affected
         if (_selectedEntry != null && volumes.Contains(_selectedEntry))
         {
             _volumeChargeDensity = _selectedEntry.ShapeParams!.VolChargeDensity;
             OnPropertyChanged(nameof(VolumeChargeDensity));
+
+            // Keep field strength in sync after balance
+            if (_chargeInputMode == ChargeInputMode.SurfaceFieldStrength)
+            {
+                double vol = ShapeLibrary.EvaluateVolume(_selectedEntry.ShapeParams!);
+                double area = SurfaceFieldConverter.ComputeSurfaceArea(_selectedEntry.ShapeParams!);
+                _surfaceFieldStrength = SurfaceFieldConverter.ChargeDensityToFieldStrength(
+                    _volumeChargeDensity, vol, area);
+                _selectedEntry.ShapeParams!.SurfaceFieldStrength = _surfaceFieldStrength;
+                OnPropertyChanged(nameof(SurfaceFieldStrength));
+            }
+
             OnPropertyChanged(nameof(ChargePerParticle));
         }
+    }
+
+    // Mirrors RefreshChargeDisplay but for the tet pipeline:
+    // mesh geometry → Gauss's law ↔ charges/cm³.
+
+    private void RefreshTetChargeDisplay()
+    {
+        if (_syncingTetCharge) return;
+        _syncingTetCharge = true;
+        try
+        {
+            if (_selectedEntry?.Mesh != null)
+            {
+                _tetMeshSurfaceArea =
+                    SurfaceFieldConverter.ComputeMeshSurfaceArea(_selectedEntry.Mesh);
+                _tetMeshVolume =
+                    SurfaceFieldConverter.ComputeMeshVolume(_selectedEntry.Mesh);
+            }
+            else
+            {
+                _tetMeshSurfaceArea = 0;
+                _tetMeshVolume = 0;
+            }
+
+            bool hasGeom = _tetMeshVolume > 1e-30 && _tetMeshSurfaceArea > 1e-30;
+
+            if (_tetChargeInputMode == ChargeInputMode.SurfaceFieldStrength && hasGeom)
+            {
+                // E → charges/cm³
+                double cpc = SurfaceFieldConverter.FieldStrengthToChargesPerCm3(
+                    _tetSurfaceFieldStrength, _tetMeshVolume, _tetMeshSurfaceArea);
+                _tetChargeDensity = cpc;
+                OnPropertyChanged(nameof(TetChargeDensity));
+            }
+            else if (hasGeom)
+            {
+                // charges/cm³ → equivalent E
+                double e = SurfaceFieldConverter.ChargesPerCm3ToFieldStrength(
+                    _tetChargeDensity, _tetMeshVolume, _tetMeshSurfaceArea);
+                _tetSurfaceFieldStrength = e;
+                OnPropertyChanged(nameof(TetSurfaceFieldStrength));
+            }
+
+            OnPropertyChanged(nameof(TetMeshSurfaceArea));
+            OnPropertyChanged(nameof(TetMeshVolume));
+            OnPropertyChanged(nameof(TetCharacteristicLength));
+            OnPropertyChanged(nameof(HasMeshGeometry));
+        }
+        finally { _syncingTetCharge = false; }
     }
 
     private async void RecalcCoulombField()
@@ -2027,7 +2382,8 @@ public sealed class MainViewModel : BaseViewModel
         mat.Children.Add(new SpecularMaterial(Brushes.White, 30));
         return new GeometryModel3D
         {
-            Geometry = geo, Material = mat,
+            Geometry = geo,
+            Material = mat,
             BackMaterial = new DiffuseMaterial(new SolidColorBrush(back)),
             Transform = entry.Transform.ToWpfTransform()
         };
@@ -2116,16 +2472,16 @@ public sealed class MainViewModel : BaseViewModel
         var arrowData = new List<(Vector3 pos, Vector3 field)>();
 
         for (int ix = 0; ix < n; ix++)
-        for (int iy = 0; iy < n; iy++)
-        for (int iz = 0; iz < n; iz++)
-        {
-            Vector3 pos = unionMin + new Vector3(ix * step.X, iy * step.Y, iz * step.Z);
-            Vector3 total = Vector3.Zero;
-            foreach (var e in fieldEntries)
-                total += FieldSuperposition.SampleEntry(e, pos);
-            float mag = total.Length();
-            if (mag > 1e-10f) { arrowData.Add((pos, total)); if (mag > maxMag) maxMag = mag; }
-        }
+            for (int iy = 0; iy < n; iy++)
+                for (int iz = 0; iz < n; iz++)
+                {
+                    Vector3 pos = unionMin + new Vector3(ix * step.X, iy * step.Y, iz * step.Z);
+                    Vector3 total = Vector3.Zero;
+                    foreach (var e in fieldEntries)
+                        total += FieldSuperposition.SampleEntry(e, pos);
+                    float mag = total.Length();
+                    if (mag > 1e-10f) { arrowData.Add((pos, total)); if (mag > maxMag) maxMag = mag; }
+                }
 
         float arrowLen = step.Length() * 0.4f;
         foreach (var (pos, field) in arrowData)
@@ -2147,7 +2503,7 @@ public sealed class MainViewModel : BaseViewModel
         Point3D origin, Vector3D direction, double length, double thickness)
     {
         var mesh = new MeshGeometry3D();
-        Vector3D up = Math.Abs(direction.Y) < 0.9 ? new Vector3D(0,1,0) : new Vector3D(1,0,0);
+        Vector3D up = Math.Abs(direction.Y) < 0.9 ? new Vector3D(0, 1, 0) : new Vector3D(1, 0, 0);
         Vector3D right = Vector3D.CrossProduct(direction, up); right.Normalize();
         up = Vector3D.CrossProduct(right, direction); up.Normalize();
         Point3D tip = origin + direction * length;
@@ -2161,7 +2517,7 @@ public sealed class MainViewModel : BaseViewModel
         for (int i = 0; i < 4; i++) { mesh.Positions.Add(bc[i]); mesh.Positions.Add(tc[i]); }
         for (int i = 0; i < 4; i++)
         {
-            int bl=i*2, tl=i*2+1, br=((i+1)%4)*2, tr=((i+1)%4)*2+1;
+            int bl = i * 2, tl = i * 2 + 1, br = ((i + 1) % 4) * 2, tr = ((i + 1) % 4) * 2 + 1;
             mesh.TriangleIndices.Add(bl); mesh.TriangleIndices.Add(br); mesh.TriangleIndices.Add(tl);
             mesh.TriangleIndices.Add(tl); mesh.TriangleIndices.Add(br); mesh.TriangleIndices.Add(tr);
         }
@@ -2172,11 +2528,11 @@ public sealed class MainViewModel : BaseViewModel
         mesh.Positions.Add(tip); int tipIdx = baseIdx; int seg = 6;
         for (int i = 0; i <= seg; i++)
         {
-            double a = 2*Math.PI*i/seg;
-            mesh.Positions.Add(headBase + right*(headR*Math.Cos(a)) + up*(headR*Math.Sin(a)));
+            double a = 2 * Math.PI * i / seg;
+            mesh.Positions.Add(headBase + right * (headR * Math.Cos(a)) + up * (headR * Math.Sin(a)));
         }
         for (int i = 0; i < seg; i++)
-        { mesh.TriangleIndices.Add(tipIdx); mesh.TriangleIndices.Add(baseIdx+1+i); mesh.TriangleIndices.Add(baseIdx+2+i); }
+        { mesh.TriangleIndices.Add(tipIdx); mesh.TriangleIndices.Add(baseIdx + 1 + i); mesh.TriangleIndices.Add(baseIdx + 2 + i); }
         return mesh;
     }
 
@@ -2517,6 +2873,8 @@ public sealed class MainViewModel : BaseViewModel
         TetMaxVolumeCm3 = _tetMaxVolumeCm3,
         TetChargeDensity = _tetChargeDensity,
         TetFieldGridDensity = _tetFieldGridDensity,
+        TetChargeInputMode = (int)_tetChargeInputMode,
+        TetSurfaceFieldStrength = _tetSurfaceFieldStrength,
         IsTetInnerPositive = _isTetInnerPositive,
         CoulombGridDensity = _coulombGridDensity,
         PathlinePlaneCenterX = _pathlinePlaneCenterX,
@@ -2551,8 +2909,15 @@ public sealed class MainViewModel : BaseViewModel
         TetMaxVolumeCm3 = m.TetMaxVolumeCm3;
         TetChargeDensity = m.TetChargeDensity;
         TetFieldGridDensity = m.TetFieldGridDensity;
+        _tetChargeInputMode = (ChargeInputMode)m.TetChargeInputMode;
+        _tetSurfaceFieldStrength = m.TetSurfaceFieldStrength;
         IsTetInnerPositive = m.IsTetInnerPositive;
         CoulombGridDensity = m.CoulombGridDensity;
+
+        OnPropertyChanged(nameof(TetChargeInputMode));
+        OnPropertyChanged(nameof(IsTetVolumeDensityMode));
+        OnPropertyChanged(nameof(IsTetSurfaceFieldMode));
+        OnPropertyChanged(nameof(TetSurfaceFieldStrength));
 
         // ── Restore probes ──
         foreach (var p in Probes)

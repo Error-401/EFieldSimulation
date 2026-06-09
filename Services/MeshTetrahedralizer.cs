@@ -471,49 +471,7 @@ public static class MeshTetrahedralizer
         return (chargeSign, stats);
     }
 
-    private static float[] ComputeDepthField_tStar(
-        List<Vector3> tetCentroids, double tetVol,
-        Vector3[] innerC, Vector3[] outerC)
-    {
-        int n = tetCentroids.Count;
-        var rawDepth = new float[n];
 
-        var innerTree = new KdTree3D(Vec3ToFloat2D(innerC));
-        var outerTree = new KdTree3D(Vec3ToFloat2D(outerC));
-
-        Parallel.For(0, n, i =>
-        {
-            var c = tetCentroids[i];
-            float dInner = Vector3.Distance(c, innerC[innerTree.FindNearest(c)]);
-            float dOuter = Vector3.Distance(c, outerC[outerTree.FindNearest(c)]);
-            float total = dInner + dOuter;
-            rawDepth[i] = total < 1e-15f ? 0.5f : dInner / total;
-        });
-
-        // Volume-balanced remapping
-        var sorted = rawDepth.OrderBy(d => d).ToArray();
-        double cumVol = 0, halfVol = n * tetVol * 0.5;
-        float tStar = 0.5f;
-        foreach (float d in sorted) { cumVol += tetVol; if (cumVol >= halfVol) { tStar = d; break; } }
-        tStar = Math.Clamp(tStar, 1e-6f, 1f - 1e-6f);
-
-        var chargeSign = new float[n];
-        for (int i = 0; i < n; i++)
-        {
-            float nd = rawDepth[i] <= tStar
-                ? 0.5f * rawDepth[i] / tStar
-                : 0.5f + 0.5f * (rawDepth[i] - tStar) / (1f - tStar);
-            chargeSign[i] = 2f * nd - 1f;
-        }
-
-        Console.WriteLine();
-        Console.WriteLine("── Depth field (raw: inner=−, outer=+) ──");
-        Console.WriteLine($"  Raw depth       : [{rawDepth.Min():F4}, {rawDepth.Max():F4}]");
-        Console.WriteLine($"  Volume median t*: {tStar:F6}");
-        Console.WriteLine($"  Negative tets   : {chargeSign.Count(s => s < 0):N0}");
-        Console.WriteLine($"  Positive tets   : {chargeSign.Count(s => s > 0):N0}");
-        return chargeSign;
-    }
 
     // ═════════════════════════════════════════════════════════
     //  Charge balancing
